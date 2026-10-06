@@ -12,7 +12,7 @@ stored here.
 ## Setup
 
 ```bash
-conda create -n fingerprint-level3-recognition-research --override-channels -c conda-forge python=3.12 pip setuptools pytest
+conda create -n fingerprint-level3-recognition-research --override-channels -c conda-forge python=3.12 pip setuptools pytest numpy "opencv=4.13.0"
 conda activate fingerprint-level3-recognition-research
 pip install -e . --no-deps --no-build-isolation
 ```

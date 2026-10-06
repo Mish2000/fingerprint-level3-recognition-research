@@ -120,10 +120,29 @@ entries are not rewritten.
 
 - **D1** Confirmed as two stages: screening by the documentation, then
   qualification by the operational test above.
-- **D2a** Exception approved for candidate S2 (SIFT at pores): the pore detector
-  from the Fingerprint Pore Detection survey repository joined with Dahia &
-  Pamplona Segundo's SIFT pore descriptors and the Pamplona Segundo & Lemes
-  spatial matching score.
+- **D2a** Exception approved for Pore SIFT: the pore detector from the
+  Fingerprint Pore Detection survey repository joined with Dahia & Pamplona
+  Segundo's SIFT pore descriptors and the Pamplona Segundo & Lemes spatial
+  matching score (score mode corrected below).
 - **F1** The feasibility sample is drawn from the subjects that C1 assigns to
   development; C1 is not otherwise activated.
 - **G2** The GitHub repository is public.
+
+## 2026-10-06 — algorithm eligibility notes approved
+
+- **Naming** Algorithms are referred to by name everywhere ("OpenCV SIFT",
+  "Pore SIFT"), never by placeholder labels.
+- **OpenCV SIFT** approved as described in `docs/algorithms/opencv-sift.md`.
+  Score = number of RANSAC inliers; 0 when there are 10 or fewer ratio-test
+  matches or no homography is found.
+- **Pore SIFT** approved as described in `docs/algorithms/pore-sift.md`.
+  Correction to the D2a entry: the score is the code-default `basic` mode (number
+  of bidirectional correspondences passing the 0.7 ratio check), not the spatial
+  score, per D2b.
+- **F1** Pass criterion: AUC ≥ 0.95 in both UxV and RxV on the F1 sample, and the
+  researcher's visual review confirms that detections sit on ridges at pore-like
+  spots. Otherwise F2 applies.
+- **G3** Two environments: the project environment (plus OpenCV from
+  conda-forge) and a separate environment for Pore SIFT's pinned dependencies
+  (Python 3.10, torch 1.13.0, opencv-contrib-python 3.4.18.65). One command
+  drives both.

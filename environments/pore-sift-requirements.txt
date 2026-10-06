@@ -1,0 +1,11 @@
+# Pore SIFT environment (docs/algorithms/pore-sift.md), separate from the project environment (G3):
+#   conda create -n fingerprint-level3-pore-sift --override-channels -c conda-forge python=3.10 pip
+#   <env>/python -m pip install -r environments/pore-sift-requirements.txt
+# torch/torchvision are the survey repository's pins; opencv-contrib 3.4.18 is the closest available to
+# Dahia & Pamplona Segundo's 3.4.0 pin.
+torch==1.13.0
+torchvision==0.14.0
+numpy==1.26.4
+opencv-contrib-python==3.4.18.65
+psutil
+tqdm

@@ -27,7 +27,7 @@ def _usable(manifest: list[dict], set_code: str) -> list[dict]:
     return [row for row in manifest if row["set"] == set_code and not int(row["excluded"])]
 
 
-def _pair(scenario: str, kind: str, probe: dict, reference: dict) -> dict:
+def pair_record(scenario: str, kind: str, probe: dict, reference: dict) -> dict:
     return {
         "pair_id": f"{scenario}:{probe['image_id']}:{reference['image_id']}",
         "scenario": scenario,
@@ -47,7 +47,7 @@ def _order(pair: dict) -> tuple:
 def genuine_pairs(manifest: list[dict], scenario: str, probe_set: str, reference_set: str) -> list[dict]:
     references = {(row["subject"], int(row["frgp"])): row for row in _usable(manifest, reference_set)}
     pairs = [
-        _pair(scenario, "genuine", probe, references[(probe["subject"], int(probe["frgp"]))])
+        pair_record(scenario, "genuine", probe, references[(probe["subject"], int(probe["frgp"]))])
         for probe in _usable(manifest, probe_set)
         if (probe["subject"], int(probe["frgp"])) in references
     ]
@@ -86,5 +86,5 @@ def impostor_pairs(
             f"impostors:{scenario}:frgp{frgp:02d}",
             key=lambda candidate: f"{candidate[0]['image_id']}|{candidate[1]['image_id']}",
         )[:per_finger]
-        pairs.extend(_pair(scenario, "impostor", probe, reference) for probe, reference in chosen)
+        pairs.extend(pair_record(scenario, "impostor", probe, reference) for probe, reference in chosen)
     return sorted(pairs, key=_order)

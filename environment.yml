@@ -7,3 +7,5 @@ dependencies:
   - pip
   - setuptools
   - pytest
+  - numpy
+  - opencv=4.13.0   # OpenCV SIFT (docs/algorithms/opencv-sift.md); 4.x as documented

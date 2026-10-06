@@ -1,0 +1,12 @@
+# Runtime locations and upstream pins for the approved algorithms.
+# Score-affecting values are not configurable: they are the documented defaults,
+# fixed in code next to their source (D2b; docs/algorithms/).
+
+[pore_sift]
+# docs/algorithms/pore-sift.md — runs in its own environment (G3).
+python = "C:/ProgramData/miniconda3/envs/fingerprint-level3-pore-sift/python.exe"
+survey_dir = "third_party/pore-survey"        # relative to the repository root
+survey_revision = "47b128e55a540d84292f91e212ad1ce3789b2aec"
+dahia_dir = "third_party/dahia-pipeline"
+dahia_revision = "b3c46518f2fba4937902b5e56093177c01474de9"
+model_sha256 = "3787e82d851701319c15fcd907d0e60df376aab2d7b8b9fe73003d2f41bffc99"
