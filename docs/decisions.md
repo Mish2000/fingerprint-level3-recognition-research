@@ -1,0 +1,129 @@
+# Decision record
+
+Decisions approved by Michael Sirkovich in chat on 2026-10-05/06, before any
+code was written. Changes are appended below with date and reason; existing
+entries are not rewritten.
+
+## R — standing rules
+
+- **R1** SD302 stays read-only at its local path; nothing is copied into it or modified.
+- **R2** Resolution is read from each file's PNG header (pHYs), not from folder
+  names. SHA-256 is verified against NIST's checksum CSVs on every manifest
+  build; a mismatch excludes the image and is reported.
+- **R3** The manifest indexes every native-1000-ppi single-finger exemplar
+  (U, V, R, Q, J) with flags; the choices below only shape the pair lists.
+- **R4** Every exclusion carries its reason; nothing is removed silently.
+  Exclusion is per image: a probe whose reference was excluded can still be an
+  impostor probe.
+- **R5** Randomness enters only the subject split (C1), impostor sampling (B3),
+  the F1 sample, bootstrap resampling (E4) and training of learned components.
+  It is implemented as keyed SHA-256 ranking from one master seed plus a
+  purpose string, so a new purpose never changes an existing sample; generated
+  samples are saved. A non-deterministic algorithm is checked by a double run
+  on a sample.
+- **R6** Each comparison type is reported separately, never pooled.
+- **R7** Anything learned or tuned (new-method parameters, fusion weights,
+  operational thresholds) is fit on development subjects only. Reading TAR at a
+  fixed FAR from an algorithm's own scores on evaluation pairs is not tuning.
+  Two sets only, development and test; a validation subset, if ever needed,
+  comes from development subjects.
+- **R8** No images, crops, templates or descriptors enter git.
+
+## A — data cleaning
+
+- **A1** Latents (sd302e/h/i) are out of scope.
+- **A2** Images named in the errata for the included sets are excluded; NIST
+  labels are never changed. Applies to R 00002420 fingers 01 and 06 (thumbs
+  swapped, errata 11 July 2023).
+- **A3** V 00002361 fingers 02 and 04 are excluded (errata 18 June 2024, marked
+  unconfirmed: "right ring is actually right index"; content of V_02 unknown).
+- **A4** V 00002472 finger 05 is excluded: not in the errata, but absent from
+  NIST's examiner-annotated set (sd302g) and showing a vertical seam with an
+  abrupt texture change.
+
+## B — comparisons and pairs
+
+- **B1** Reference set V (NIST's baseline exemplar set: one physical device,
+  examiner-annotated in sd302g). Probes are compared against it in one fixed
+  direction for every algorithm.
+- **B2** Scenarios: UxV (rolled vs rolled) and RxV (plain from slap vs rolled).
+  Q and J stay in the manifest only.
+- **B3** Impostor = same finger position, different subject. Long term: the
+  full set. Now: 1,000 per finger position per scenario (10,000), keyed-hash
+  sample, identical for every algorithm.
+- **B4** A full run must finish within 24 h wall clock on the research PC. A
+  timing pilot (about 100 extractions and 2,000 comparisons) precedes every full
+  run, and its projection is approved first.
+
+## C — split
+
+- **C1** Approved in principle: 50/50 by subject, stratified by whether the
+  subject has R images, keyed hash. Activation is postponed until something has
+  to be tuned; the split is defined in code and fixed by the master seed.
+
+## G — infrastructure
+
+- **G1** Root folder `C:\fingerprint-level3-recognition-research`.
+- **G2** Git from the first commit; a GitHub repository (public is acceptable).
+- **G3** Conda environment from conda-forge through the existing Miniconda,
+  Python 3.12.
+
+## D — algorithm eligibility
+
+- **D1** Only systems designed for ≥1000 ppi input.
+  - Screening: documentation shows the algorithm can take ≥1000-ppi input.
+  - Qualification: the input is not normalised below 1000 ppi before feature
+    extraction (open source: verified in the code; closed SDK: a written vendor
+    statement). Multi-scale analysis that includes the native resolution, such
+    as the SIFT scale space, is acceptable.
+  - Systems documented to normalise internally to 500 ppi (for example
+    SourceAFIS, Innovatrics IDKit, id3) do not qualify.
+- **D2** Integration only, no change to algorithm code. Each algorithm gets an
+  eligibility note stating exactly what its wrapper does, approved per algorithm.
+  - **D2a** Separately published components may be joined only if their authors
+    document them together; otherwise only as an explicitly approved exception.
+  - **D2b** Score-affecting parameters keep their default values.
+- **D3** Algorithms trained or validated on SD302 are included and flagged.
+- **D4** Closed commercial SDKs are allowed as black boxes when the licence
+  permits research use and publication of results.
+- **D5** No quota: whatever qualifies is included.
+
+## E — evaluation
+
+- **E1** A failure to produce a score counts at the lowest score and failure
+  rates are reported separately (ISO/IEC 19795-1 practice); a common-subset
+  table is secondary.
+- **E2** TAR at FAR 1 % and 0.1 % (0.01 % only if the runtime allows), EER, DET
+  curves, failure rates, and runtime with extraction separate from comparison.
+- **E3** Algorithms are compared by the ROC on the evaluation pairs (TAR at a
+  fixed FAR from each algorithm's own scores); a development-set threshold is
+  used only for operational claims about the new method.
+- **E4** 95 % confidence intervals by subject-level bootstrap; algorithms are
+  compared pairwise on identical pairs.
+- **E5** All work runs on the current PC. Reported timings are single-thread on
+  a sample; full runs may run in parallel.
+
+## F — Level 3 and the new method
+
+- **F1** A pore-feasibility gate on a small development sample of SD302 comes
+  before developing the method.
+- **F2** If the gate fails, stop and decide with the PI.
+- **F3** Pores as an additional channel alongside minutiae; more features are
+  welcome when they serve the goal.
+- **F4** Primary success criterion: fusing the Level-3 channel with the best
+  existing algorithm lowers FRR at FAR 0.1 % on the test set (paired
+  subject-level bootstrap). Secondary: the new method alone versus the best
+  existing algorithm.
+- **F5** Liveness detection is out of scope for now.
+
+## 2026-10-06 — confirmations
+
+- **D1** Confirmed as two stages: screening by the documentation, then
+  qualification by the operational test above.
+- **D2a** Exception approved for candidate S2 (SIFT at pores): the pore detector
+  from the Fingerprint Pore Detection survey repository joined with Dahia &
+  Pamplona Segundo's SIFT pore descriptors and the Pamplona Segundo & Lemes
+  spatial matching score.
+- **F1** The feasibility sample is drawn from the subjects that C1 assigns to
+  development; C1 is not otherwise activated.
+- **G2** The GitHub repository is public.

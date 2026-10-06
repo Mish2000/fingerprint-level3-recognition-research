@@ -1,0 +1,9 @@
+name: fingerprint-level3-recognition-research
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - pip
+  - setuptools
+  - pytest

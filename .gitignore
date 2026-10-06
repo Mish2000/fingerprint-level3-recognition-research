@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+/build/
+/dist/
+
+# Environments
+/.conda-env/
+/.venv/
+
+# Local-only material at the repository root, never committed
+/runs/
+/third_party/
+/data/
+/local/
+
+# Biometric imagery and derived artifacts must never enter git (R8)
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.tif
+*.tiff
+*.wsq
+*.jp2
+*.npz
+*.npy
+*.irr
+*.lffs
+*.comp
+
+# Editors / OS
+.idea/
+.vscode/
+Thumbs.db

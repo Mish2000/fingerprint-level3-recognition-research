@@ -1,0 +1,120 @@
+{
+  "checksum": {
+    "ok": 7059
+  },
+  "dataset": {
+    "errata_sha256": "ac34a920d2fb0aa337efaa41ab013c191cc95a55bae12cc2746f6f5f88823358",
+    "root": "C:/fingerprint-datasets/NIST/SD302",
+    "versions": {
+      "sd302b": "20180814",
+      "sd302c": "20190207"
+    }
+  },
+  "dataset_problems": [],
+  "excluded_images": {
+    "R_00002420_01": "A2: errata: segmented slap thumbs swapped (01 <-> 06)",
+    "R_00002420_06": "A2: errata: segmented slap thumbs swapped (01 <-> 06)",
+    "V_00002361_02": "A3: errata lists V right ring as actually right index (unconfirmed); content of V finger 02 unknown",
+    "V_00002361_04": "A3: errata: V right ring is actually right index (unconfirmed)",
+    "V_00002472_05": "A4: not in errata; absent from NIST examiner-annotated set sd302g; visible vertical seam and texture discontinuity"
+  },
+  "header_ppi": {
+    "1000.0x1000.0": 7059
+  },
+  "images": {
+    "J": {
+      "excluded": 0,
+      "subjects": 161,
+      "total": 1275
+    },
+    "Q": {
+      "excluded": 0,
+      "subjects": 108,
+      "total": 864
+    },
+    "R": {
+      "excluded": 2,
+      "subjects": 92,
+      "total": 920
+    },
+    "U": {
+      "excluded": 0,
+      "subjects": 200,
+      "total": 2000
+    },
+    "V": {
+      "excluded": 3,
+      "subjects": 200,
+      "total": 2000
+    }
+  },
+  "master_seed": "fpl3-sd302-v1",
+  "scenarios": {
+    "RxV": {
+      "genuine": 916,
+      "genuine_per_finger": {
+        "01": 91,
+        "02": 91,
+        "03": 92,
+        "04": 91,
+        "05": 92,
+        "06": 91,
+        "07": 92,
+        "08": 92,
+        "09": 92,
+        "10": 92
+      },
+      "impostor": 10000,
+      "impostor_per_finger": {
+        "01": 1000,
+        "02": 1000,
+        "03": 1000,
+        "04": 1000,
+        "05": 1000,
+        "06": 1000,
+        "07": 1000,
+        "08": 1000,
+        "09": 1000,
+        "10": 1000
+      },
+      "probe": "R",
+      "probe_subjects_in_genuine": 92,
+      "reference": "V"
+    },
+    "UxV": {
+      "genuine": 1997,
+      "genuine_per_finger": {
+        "01": 200,
+        "02": 199,
+        "03": 200,
+        "04": 199,
+        "05": 199,
+        "06": 200,
+        "07": 200,
+        "08": 200,
+        "09": 200,
+        "10": 200
+      },
+      "impostor": 10000,
+      "impostor_per_finger": {
+        "01": 1000,
+        "02": 1000,
+        "03": 1000,
+        "04": 1000,
+        "05": 1000,
+        "06": 1000,
+        "07": 1000,
+        "08": 1000,
+        "09": 1000,
+        "10": 1000
+      },
+      "probe": "U",
+      "probe_subjects_in_genuine": 200,
+      "reference": "V"
+    }
+  },
+  "split": {
+    "active": false,
+    "note": "C1 defined in fpl3.data.split; not applied"
+  }
+}

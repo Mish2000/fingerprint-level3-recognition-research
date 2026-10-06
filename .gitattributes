@@ -1,0 +1,2 @@
+# LF everywhere, so generated manifests stay byte-identical after checkout on Windows.
+* text=auto eol=lf

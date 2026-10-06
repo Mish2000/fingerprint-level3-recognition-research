@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fpl3"
+version = "0.1.0"
+description = "Level-3 fingerprint recognition research on native 1000 ppi NIST SD302 images"
+requires-python = ">=3.12"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "dataset: needs the local NIST SD302 copy named in configs/protocol.toml (skipped when absent)",
+]

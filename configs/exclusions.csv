@@ -1,0 +1,6 @@
+set,subject,frgp,decision,reason,source
+V,00002361,2,A3,"errata lists V right ring as actually right index (unconfirmed); content of V finger 02 unknown",ERRATA_SD302.txt 18 June 2024
+V,00002361,4,A3,"errata: V right ring is actually right index (unconfirmed)",ERRATA_SD302.txt 18 June 2024
+R,00002420,1,A2,"errata: segmented slap thumbs swapped (01 <-> 06)",ERRATA_SD302.txt 11 July 2023
+R,00002420,6,A2,"errata: segmented slap thumbs swapped (01 <-> 06)",ERRATA_SD302.txt 11 July 2023
+V,00002472,5,A4,"not in errata; absent from NIST examiner-annotated set sd302g; visible vertical seam and texture discontinuity",visual check 2026-10-06

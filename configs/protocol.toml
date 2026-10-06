@@ -1,0 +1,26 @@
+# Data-layer protocol. Decision IDs refer to docs/decisions.md.
+
+[dataset]
+# Local NIST SD302 copy, read-only (R1).
+root = "C:/fingerprint-datasets/NIST/SD302"
+
+[randomness]
+# Every random step ranks its candidates by SHA-256(master_seed | purpose | item) (R5).
+master_seed = "fpl3-sd302-v1"
+
+# Probe set first, reference set second (B1). Q and J stay in the manifest only (B2).
+[scenarios.UxV]
+probe = "U"
+reference = "V"
+impostors_per_finger = 1000   # B3 compact design: 10 finger positions -> 10,000
+
+[scenarios.RxV]
+probe = "R"
+reference = "V"
+impostors_per_finger = 1000
+
+[split]
+# C1 approved in principle; activation postponed until something has to be tuned.
+active = false
+dev_fraction = 0.5
+stratify_by = "has_R"
