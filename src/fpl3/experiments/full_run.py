@@ -276,14 +276,14 @@ class Progress:
         return sum(m["finished"] - m["started"] for m in metas) / expected if expected > 0 else None
 
     def stage_factor(self, stage: Stage, now: float) -> float:
-        """From the stage's own chunks (the last two hours once there are enough), else from
-        stages of the same algorithm and kind, else of the same algorithm, else 1."""
+        """From the stage's own chunks (the last two hours once there are enough), else from the
+        stages of the same algorithm and kind, else 1: extraction and comparison keep separate
+        paces, so one never forecasts the other."""
         own = list(self.done[stage.name].values())
         recent = [m for m in own if m["finished"] > now - 7200]
         candidates = [
             recent if len(recent) >= self.workers else own,
             [m for s in self.stages if (s.algorithm, s.kind) == (stage.algorithm, stage.kind) for m in self.done[s.name].values()],
-            [m for s in self.stages if s.algorithm == stage.algorithm for m in self.done[s.name].values()],
         ]
         for metas in candidates:
             factor = self.factor(metas)
