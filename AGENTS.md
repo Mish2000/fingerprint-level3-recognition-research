@@ -118,6 +118,12 @@ pytest                           # + integration tests against local SD302
   FRR 10 %, FAR 0/180; plain vs rolled TAR 65 %, FRR 35 %, FAR 0/180 (lowest
   threshold accepting no impostor). Rejections are mostly left little fingers.
   Since 2026-10-07, F1 is informational only: Pore SIFT continues.
+- OpenCV SIFT on the same 400 F1 pairs (2026-10-07, seeded): rolled vs rolled
+  TAR 19/20, FAR 0/180; plain vs rolled TAR 14/20, FAR 0/180.
+- Timing pilots (2026-10-07, 12 workers, both deterministic): OpenCV SIFT
+  compact 0.42 h, full 8.0 h; Pore SIFT compact 1.83 h, full 6.25 h.
+- Next: the researcher chooses compact or full runs for both algorithms; then
+  the scenario runs and TAR at FAR 1 % / 0.1 % (0.01 % with the full design).
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
