@@ -114,9 +114,10 @@ pytest                           # + integration tests against local SD302
   - Pore SIFT (`docs/algorithms/pore-sift.md`): survey pore detector →
     Dahia & Pamplona Segundo SIFT descriptors at pores → `basic` correspondence
     count; separate environment; its first run is the F1 gate.
-- F1 run (2026-10-06): UxV AUC 0.985 (pass), RxV AUC 0.896 (fail; subject
-  bootstrap 95 % CI 0.829–0.960). The weakest genuine pairs are mostly left
-  little fingers (position 10). By the approved rule the gate failed, so F2
-  applies: Pore SIFT work is stopped pending the PI's decision.
-- Next: the researcher's decision on F2; the OpenCV SIFT timing pilot (independent
-  of F1) awaits a go-ahead. Full runs only after projections are approved.
+- F1 run (2026-10-06), Pore SIFT, 400 pairs: rolled vs rolled TAR 90 %,
+  FRR 10 %, FAR 0/180; plain vs rolled TAR 65 %, FRR 35 %, FAR 0/180 (lowest
+  threshold accepting no impostor). Rejections are mostly left little fingers.
+  Since 2026-10-07, F1 is informational only: Pore SIFT continues.
+- Report results to the researcher as plain TAR / FAR / FRR with pair counts;
+  avoid AUC and statistical jargon unless asked.
+- Do not push to GitHub until the researcher asks.

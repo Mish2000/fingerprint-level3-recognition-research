@@ -47,6 +47,13 @@ fails or no homography is found. Higher means more similar.
 descriptors (where the tutorial's `for m, n in matches` cannot run), is recorded
 as a failure, not as a score; metrics then treat it as the lowest score.
 
+**Reproducibility (R5, added 2026-10-07):** FLANN's randomised KD-trees draw from
+OpenCV's random generator. Unseeded, the timing pilot gave 115 of 200 pairs a
+different score on a second run (by up to 9). The wrapper therefore calls
+`cv.setRNGSeed(seed)` before every comparison, with the seed derived from the
+master seed. Scores are then identical across runs, processes and order. No
+documented parameter changes.
+
 ## Execution and runtime (B4, E5)
 
 - Environment: the project environment plus `opencv` from conda-forge, version

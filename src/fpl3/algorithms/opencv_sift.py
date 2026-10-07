@@ -36,8 +36,24 @@ def extract(path: Path) -> tuple[np.ndarray, np.ndarray]:
     return points, descriptors
 
 
-def compare(probe: tuple[np.ndarray, np.ndarray], reference: tuple[np.ndarray, np.ndarray]) -> dict:
-    """Probe = query, reference = train (B1). Returns status, score and the number of ratio-test matches."""
+def rng_seed(master_seed: str) -> int:
+    """Seed for OpenCV's random generator, derived from the master seed (R5)."""
+    from ..data.sampling import keyed_hash
+
+    return int(keyed_hash(master_seed, "opencv-sift-rng", "")[:8], 16)
+
+
+def compare(
+    probe: tuple[np.ndarray, np.ndarray], reference: tuple[np.ndarray, np.ndarray], seed: int | None = None
+) -> dict:
+    """Probe = query, reference = train (B1). Returns status, score and the number of ratio-test matches.
+
+    FLANN's randomised KD-trees draw from OpenCV's random generator, so unseeded scores vary from run
+    to run (115 of 200 pilot pairs did). Seeding it before every comparison makes each score
+    reproducible regardless of process or order; no documented parameter changes.
+    """
+    if seed is not None:
+        cv2.setRNGSeed(seed)
     points1, descriptors1 = probe
     points2, descriptors2 = reference
     if len(descriptors1) == 0 or len(descriptors2) < 2:
@@ -59,8 +75,13 @@ def compare(probe: tuple[np.ndarray, np.ndarray], reference: tuple[np.ndarray, n
 # ---- process-pool helpers (one OpenCV thread per process, E5) ----
 
 
-def init_worker() -> None:
+_SEED: int | None = None
+
+
+def init_worker(seed: int | None = None) -> None:
+    global _SEED
     cv2.setNumThreads(1)
+    _SEED = seed
 
 
 def extract_job(job: tuple[str, str, str]) -> dict:
@@ -85,6 +106,6 @@ def compare_job(job: tuple[dict, str]) -> dict:
     probe = _load(str(Path(features_dir) / f"{pair['probe_image_id']}.npz"))
     reference = _load(str(Path(features_dir) / f"{pair['reference_image_id']}.npz"))
     loaded = time.perf_counter()
-    result = compare(probe, reference)
+    result = compare(probe, reference, _SEED)
     done = time.perf_counter()
     return {"pair_id": pair["pair_id"], **result, "load_s": loaded - start, "compare_s": done - loaded}

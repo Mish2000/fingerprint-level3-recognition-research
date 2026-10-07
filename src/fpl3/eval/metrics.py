@@ -19,6 +19,25 @@ def auc(genuine: list[float], impostor: list[float]) -> float:
     return wins / (len(genuine) * len(ordered))
 
 
+def no_false_accept_point(genuine: list[float | None], impostor: list[float | None]) -> dict:
+    """The strictest operating point that accepts no impostor: a pair is accepted when its score is
+    above every impostor score. A failure (None) is never accepted (E1)."""
+    scored = [s for s in impostor if s is not None]
+    top = max(scored) if scored else None
+    true_accepts = sum(1 for s in genuine if s is not None and (top is None or s > top))
+    return {
+        "accept_if_score_above": top,
+        "genuine": len(genuine),
+        "true_accepts": true_accepts,
+        "false_rejects": len(genuine) - true_accepts,
+        "impostor": len(impostor),
+        "false_accepts": 0,
+        "tar": true_accepts / len(genuine),
+        "frr": 1 - true_accepts / len(genuine),
+        "far": 0.0,
+    }
+
+
 def summary(values: list[float]) -> dict:
     """Count, mean, median, 95th percentile (nearest rank), min and max."""
     if not values:

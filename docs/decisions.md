@@ -146,3 +146,12 @@ entries are not rewritten.
   conda-forge) and a separate environment for Pore SIFT's pinned dependencies
   (Python 3.10, torch 1.13.0, opencv-contrib-python 3.4.18.65). One command
   drives both.
+
+## 2026-10-07 — F1 no longer disqualifies
+
+- **F1/F2** F1 is informational only. An algorithm is not dropped for missing an
+  accuracy target, because so few candidates qualify (consistent with D5); F2 no
+  longer applies. Pore SIFT continues after its F1 run of 2026-10-06 (rolled vs
+  rolled TAR 90 %, FRR 10 %, FAR 0/180; plain vs rolled TAR 65 %, FRR 35 %,
+  FAR 0/180, at the lowest threshold that accepts no impostor).
+- **G2** Nothing is pushed to GitHub until the researcher asks.
