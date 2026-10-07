@@ -74,7 +74,8 @@ manifests/     generated and committed: images.csv, pairs.csv, build_report.json
                f1_images.csv / f1_pairs.csv (F1 sample)
 src/fpl3/      data/ (SD302 readers, manifest, pairs, keyed-hash sampling, split, samples)
                algorithms/ (OpenCV SIFT wrapper; Pore SIFT driver + worker)
-               eval/ (AUC, summaries)   experiments/ (F1 gate)
+               eval/ (AUC, TAR at FAR, summaries)
+               experiments/ (F1 gate, sample runs, timing pilots, full run)
 tests/         unit tests; integration tests marked `dataset`
 runs/, third_party/   local only, git-ignored (features, overlays, upstream checkouts)
 ```
@@ -91,6 +92,8 @@ pip install -e . --no-deps --no-build-isolation
 
 python -m fpl3.data.build        # rebuild manifests (about 12 s, byte-identical)
 python -m fpl3.experiments.f1    # F1 gate -> runs/f1 (refuses to overwrite)
+python -m fpl3.experiments.full_run            # full run -> runs/full; the same command resumes it
+python -m fpl3.experiments.full_run --status   # progress and expected finish (also runs/full/progress.html)
 pytest -m "not dataset"          # unit tests
 pytest                           # + integration tests against local SD302
 ```
@@ -122,8 +125,12 @@ pytest                           # + integration tests against local SD302
   TAR 19/20, FAR 0/180; plain vs rolled TAR 14/20, FAR 0/180.
 - Timing pilots (2026-10-07, 12 workers, both deterministic): OpenCV SIFT
   compact 0.42 h, full 8.0 h; Pore SIFT compact 1.83 h, full 6.25 h.
-- Next: the researcher chooses compact or full runs for both algorithms; then
-  the scenario runs and TAR at FAR 1 % / 0.1 % (0.01 % with the full design).
+- Full run approved (2026-10-07; B3, B4, E2 entries): both algorithms on all
+  582,724 pairs each, compact pairs first, about 15 h; `fpl3.experiments.full_run`
+  saves every finished chunk, resumes after an interruption and writes
+  runs/full/progress.html, report.json and scores/<algorithm>.csv. TAR at FAR
+  uses the lowest threshold at which FAR does not exceed the target; this rule
+  awaits the researcher's confirmation before it enters decisions.md.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.

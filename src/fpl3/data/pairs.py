@@ -54,6 +54,21 @@ def genuine_pairs(manifest: list[dict], scenario: str, probe_set: str, reference
     return sorted(pairs, key=_order)
 
 
+def all_impostor_pairs(manifest: list[dict], scenario: str, probe_set: str, reference_set: str) -> list[dict]:
+    """Every impostor pair: each probe against each reference of the same finger position from
+    another subject (B3 full design, decision record 2026-10-07)."""
+    references: dict[int, list[dict]] = defaultdict(list)
+    for row in _usable(manifest, reference_set):
+        references[int(row["frgp"])].append(row)
+    pairs = [
+        pair_record(scenario, "impostor", probe, reference)
+        for probe in _usable(manifest, probe_set)
+        for reference in references.get(int(probe["frgp"]), [])
+        if probe["subject"] != reference["subject"]
+    ]
+    return sorted(pairs, key=_order)
+
+
 def impostor_pairs(
     manifest: list[dict],
     scenario: str,

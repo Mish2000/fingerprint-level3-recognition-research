@@ -155,3 +155,16 @@ entries are not rewritten.
   rolled TAR 90 %, FRR 10 %, FAR 0/180; plain vs rolled TAR 65 %, FRR 35 %,
   FAR 0/180, at the lowest threshold that accepts no impostor).
 - **G2** Nothing is pushed to GitHub until the researcher asks.
+
+## 2026-10-07 — full run
+
+- **B3** The full impostor set runs now for OpenCV SIFT and Pore SIFT: every
+  probe against every reference of the same finger position, 582,724 pairs per
+  algorithm (UxV 1,997 genuine + 397,403 impostors; RxV 916 genuine + 182,408
+  impostors). The compact pairs are a subset; they run first and are reported
+  as well.
+- **B4** Projection approved: about 15 h for both algorithms one after the other
+  with 12 workers (OpenCV SIFT 8.5–9 h, Pore SIFT 6–7 h), from timings per
+  comparison type. The earlier 14.25 h came from a pilot with a larger share of
+  plain vs rolled pairs than the full design.
+- **E2** TAR at FAR 0.01 % is reported as well, since the runtime allows it.

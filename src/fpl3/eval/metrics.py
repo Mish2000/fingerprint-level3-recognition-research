@@ -1,8 +1,9 @@
-"""Score statistics used before the full evaluation layer exists (F1 gate, timing pilots)."""
+"""Score statistics used before the full evaluation layer exists (F1 gate, timing pilots, full run)."""
 
 from __future__ import annotations
 
 import bisect
+import math
 import statistics
 
 
@@ -35,6 +36,36 @@ def no_false_accept_point(genuine: list[float | None], impostor: list[float | No
         "tar": true_accepts / len(genuine),
         "frr": 1 - true_accepts / len(genuine),
         "far": 0.0,
+    }
+
+
+def tar_at_far(genuine: list[float | None], impostor: list[float | None], far: float) -> dict:
+    """TAR at the lowest threshold whose FAR does not exceed `far` (E2).
+
+    A pair is accepted when its score is above the threshold, so impostors tied at the
+    threshold are rejected and FAR never exceeds the target; a failure (None) is never
+    accepted (E1). The threshold is None when every scored pair can be accepted.
+    """
+    allowed = math.floor(far * len(impostor) + 1e-9)
+    scored = sorted((s for s in impostor if s is not None), reverse=True)
+    top = scored[allowed] if allowed < len(scored) else None
+
+    def accepted(score):
+        return score is not None and (top is None or score > top)
+
+    true_accepts = sum(1 for s in genuine if accepted(s))
+    false_accepts = sum(1 for s in impostor if accepted(s))
+    return {
+        "far_target": far,
+        "accept_if_score_above": top,
+        "genuine": len(genuine),
+        "true_accepts": true_accepts,
+        "false_rejects": len(genuine) - true_accepts,
+        "impostor": len(impostor),
+        "false_accepts": false_accepts,
+        "tar": true_accepts / len(genuine),
+        "frr": 1 - true_accepts / len(genuine),
+        "far": false_accepts / len(impostor),
     }
 
 

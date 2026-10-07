@@ -76,3 +76,61 @@ def run_parallel(
             raise RuntimeError(f"pore SIFT worker failed ({command}); see {log.name}")
         results.extend(json.loads(Path(out_path).read_text(encoding="utf-8")))
     return results, time.perf_counter() - start
+
+
+def run_chunks(
+    command: str,
+    chunks: list[tuple[str, list[dict]]],
+    workers: int,
+    settings: dict,
+    features_dir: Path,
+    work_dir: Path,
+    on_done,
+    tick=lambda: None,
+    worker: Path = WORKER,
+) -> None:
+    """Run many (key, items) chunks in order with at most `workers` worker processes at a time, so
+    a slow chunk never holds the others back. on_done(key, results, started, finished) runs in the
+    driver as each chunk succeeds (epoch seconds); tick() runs about twice a second and may raise
+    to stop. A failed chunk stops every running worker and raises."""
+    work_dir.mkdir(parents=True, exist_ok=True)
+    pending = list(chunks)
+    running = {}
+    try:
+        while pending or running:
+            while pending and len(running) < workers:
+                key, items = pending.pop(0)
+                stem = work_dir / f"{command}-{key}"
+                job = {
+                    "survey_dir": settings["survey_dir"],
+                    "dahia_dir": settings["dahia_dir"],
+                    "model_sha256": settings["model_sha256"],
+                    "features_dir": str(features_dir),
+                    "threads": 1,
+                    "out_path": f"{stem}.json",
+                    ("images" if command == "extract" else "pairs"): items,
+                }
+                Path(f"{stem}.job.json").write_text(json.dumps(job), encoding="utf-8")
+                log = open(f"{stem}.log", "w", encoding="utf-8")
+                process = subprocess.Popen([settings["python"], str(worker), command, "--job", f"{stem}.job.json"],
+                                           stdout=log, stderr=subprocess.STDOUT)
+                running[key] = (process, log, stem, time.time())
+            time.sleep(0.5)
+            for key, (process, log, stem, started) in list(running.items()):
+                code = process.poll()
+                if code is None:
+                    continue
+                log.close()
+                del running[key]
+                if code != 0:
+                    raise RuntimeError(f"pore SIFT worker failed ({command} {key}); see {stem}.log")
+                results = json.loads(Path(f"{stem}.json").read_text(encoding="utf-8"))
+                on_done(key, results, started, time.time())
+                Path(f"{stem}.job.json").unlink()
+                Path(f"{stem}.json").unlink()
+            tick()
+    finally:
+        for process, log, _, _ in running.values():
+            process.kill()
+            process.wait()
+            log.close()
