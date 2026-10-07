@@ -40,7 +40,8 @@ def rng_seed(master_seed: str) -> int:
     """Seed for OpenCV's random generator, derived from the master seed (R5)."""
     from ..data.sampling import keyed_hash
 
-    return int(keyed_hash(master_seed, "opencv-sift-rng", "")[:8], 16)
+    # cv.setRNGSeed takes a C int, so keep 31 bits.
+    return int(keyed_hash(master_seed, "opencv-sift-rng", "")[:8], 16) & 0x7FFFFFFF
 
 
 def compare(
