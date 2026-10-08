@@ -19,6 +19,8 @@ import csv
 import json
 import math
 import time
+from concurrent.futures import ThreadPoolExecutor
+from itertools import groupby
 from pathlib import Path
 
 import cv2
@@ -92,44 +94,110 @@ def augment(patches: torch.Tensor, generator: torch.Generator) -> torch.Tensor:
     return F.grid_sample(out, grid, mode="bilinear", padding_mode="zeros", align_corners=False)
 
 
-def basic_scores(descs1: torch.Tensor, descs2: torch.Tensor, ratio: float = RATIO) -> int:
+def basic_score(descs1: torch.Tensor, descs2: torch.Tensor, ratio: float = RATIO) -> torch.Tensor:
     """matching.basic / utils.find_correspondences: mutual nearest descriptors whose squared distance passes
-    the ratio check in both directions."""
+    the ratio check in both directions. Returns a 0-d tensor, so many pairs can be queued before one sync."""
     if len(descs1) == 0 or len(descs2) == 0:
-        return 0
+        return torch.zeros((), dtype=torch.long, device=descs1.device)
     d = (descs1 * descs1).sum(1)[:, None] - 2 * descs1 @ descs2.T + (descs2 * descs2).sum(1)[None, :]
     rows = torch.arange(len(descs1), device=d.device)
     if len(descs1) == 1 or len(descs2) == 1:
         j = d.argmin(1)
-        return int((d.argmin(0)[j] == rows).sum())
+        return (d.argmin(0)[j] == rows).sum()
     v1, i1 = d.topk(2, dim=1, largest=False)
     v2, i2 = d.topk(2, dim=0, largest=False)
     j = i1[:, 0]
-    keep = (i2[0, j] == rows) & (v1[:, 0] < ratio * v1[:, 1]) & (v1[:, 0] < ratio * v2[1, j])
-    return int(keep.sum())
+    return ((i2[0, j] == rows) & (v1[:, 0] < ratio * v1[:, 1]) & (v1[:, 0] < ratio * v2[1, j])).sum()
+
+
+def basic_scores(descs1: torch.Tensor, descs2: torch.Tensor, ratio: float = RATIO) -> int:
+    return int(basic_score(descs1, descs2, ratio))
+
+
+def many_scores(pairs: list[tuple[torch.Tensor, torch.Tensor]], flush: int = 2000) -> list[int]:
+    """basic_score for many pairs, syncing with the GPU once per `flush` pairs."""
+    out, queued = [], []
+    for d1, d2 in pairs:
+        queued.append(basic_score(d1.float(), d2.float()))
+        if len(queued) == flush:
+            out += torch.stack(queued).tolist()
+            queued = []
+    return out + (torch.stack(queued).tolist() if queued else [])
 
 
 def image_patches(image: np.ndarray, points: np.ndarray) -> np.ndarray:
     """utils.trained_descriptors: img[r - 16 : r + 16, c - 16 : c + 16] at every pore whose window fits."""
     h = PATCH // 2
     ok = (points[:, 0] >= h) & (points[:, 0] < image.shape[0] - h) & (points[:, 1] >= h) & (points[:, 1] < image.shape[1] - h)
-    return np.stack([image[r - h : r + h, c - h : c + h] for r, c in points[ok]]) if ok.any() else np.zeros((0, PATCH, PATCH), np.uint8)
+    windows = np.lib.stride_tricks.sliding_window_view(image, (PATCH, PATCH))
+    return np.ascontiguousarray(windows[points[ok, 0] - h, points[ok, 1] - h])
 
 
 @torch.no_grad()
-def describe(net: nn.Module, patches_u8: torch.Tensor, batch: int = 16384) -> torch.Tensor:
+def describe(net: nn.Module, patches_u8: torch.Tensor, batch: int = 2048) -> torch.Tensor:
+    """Batches stay small: 16,384 patches at once filled the 16 GB card and the driver spilled into RAM."""
     net.eval()
     out = [net(patches_u8[i : i + batch].float().div(255).unsqueeze(1)) for i in range(0, len(patches_u8), batch)]
     return torch.cat(out) if out else torch.zeros((0, 128), device=DEVICE)
 
 
+def read_patches(row: dict, root: Path) -> np.ndarray:
+    image = cv2.imread(str(root / row["relpath"]), cv2.IMREAD_GRAYSCALE)
+    with np.load(pore_file(row["image_id"])) as f:
+        return image_patches(image, f["points"].astype(int))
+
+
 def load_image_patches(rows: list[dict], root: Path) -> list[torch.Tensor]:
-    out = []
-    for row in rows:
-        image = cv2.imread(str(root / row["relpath"]), cv2.IMREAD_GRAYSCALE)
-        with np.load(pore_file(row["image_id"])) as f:
-            out.append(torch.from_numpy(image_patches(image, f["points"].astype(int))).to(DEVICE))
-    return out
+    with ThreadPoolExecutor(8) as pool:  # image decoding releases the GIL, so the GPU is not left waiting
+        return [torch.from_numpy(p).to(DEVICE) for p in pool.map(lambda row: read_patches(row, root), rows)]
+
+
+def batched_scores(probe: torch.Tensor, references: list[torch.Tensor], ratio: float = RATIO,
+                   budget: int = 120_000_000) -> list[int]:
+    """basic_score of one probe against many references, a group at a time: the references are padded
+    into one tensor and every distance matrix of the group comes from one batched matrix product."""
+    scores = [0] * len(references)
+    n = len(probe)
+    usual = [k for k, r in enumerate(references) if len(r) >= 2]
+    for k, r in enumerate(references):
+        if n and 0 < len(r) and (n == 1 or len(r) == 1):
+            scores[k] = int(basic_score(probe, r, ratio))
+    if n < 2 or not usual:
+        return scores
+    p2 = (probe * probe).sum(1)
+    rows = torch.arange(n, device=probe.device)
+    start = 0
+    while start < len(usual):
+        group, widest = [usual[start]], len(references[usual[start]])
+        start += 1
+        while start < len(usual):
+            wider = max(widest, len(references[usual[start]]))
+            if (len(group) + 1) * n * wider > budget:
+                break
+            group.append(usual[start])
+            widest, start = wider, start + 1
+        padded = torch.zeros((len(group), widest, probe.shape[1]), dtype=probe.dtype, device=probe.device)
+        valid = torch.zeros((len(group), widest), dtype=torch.bool, device=probe.device)
+        for g, k in enumerate(group):
+            padded[g, : len(references[k])] = references[k]
+            valid[g, : len(references[k])] = True
+        d = torch.matmul(probe.unsqueeze(0), padded.transpose(1, 2))  # group x probe x reference, contiguous
+        d.mul_(-2).add_(p2[None, :, None]).add_((padded * padded).sum(-1)[:, None, :])  # in place: one matrix in memory
+        d.masked_fill_(~valid[:, None, :], math.inf)
+        # nearest and second nearest by min reductions (faster than topk): rows first, then columns
+        row_best, j = d.min(dim=2)  # each probe descriptor's nearest reference descriptor
+        d.scatter_(2, j.unsqueeze(2), math.inf)
+        row_second = d.min(dim=2).values
+        d.scatter_(2, j.unsqueeze(2), row_best.unsqueeze(2))  # restore
+        best_row = d.min(dim=1).indices  # each reference descriptor's nearest probe descriptor
+        d.scatter_(1, best_row.unsqueeze(1), math.inf)
+        column_second = d.min(dim=1).values
+        keep = ((torch.gather(best_row, 1, j) == rows[None, :]) & (row_best < ratio * row_second)
+                & (row_best < ratio * torch.gather(column_second, 1, j)))
+        for g, s in zip(group, keep.sum(1).tolist()):
+            scores[g] = s
+        del d, row_best, j, row_second, best_row, column_second, keep
+    return scores
 
 
 def eer(genuine: np.ndarray, impostor: np.ndarray) -> float:
@@ -153,8 +221,11 @@ def validation_set(protocol: dict, images: list[dict], validation: list[str]):
 
 def validation_eer(net, val) -> float:
     patches_u, patches_v, pairs = val
-    descs_u, descs_v = [describe(net, p) for p in patches_u], [describe(net, p) for p in patches_v]
-    scores = np.array([basic_scores(descs_u[i], descs_v[j]) for i, j, _ in pairs])
+    with torch.no_grad():
+        descs_u, descs_v = [describe(net, p) for p in patches_u], [describe(net, p) for p in patches_v]
+        scores = np.array(many_scores([(descs_u[i], descs_v[j]) for i, j, _ in pairs]))
+    del descs_u, descs_v
+    torch.cuda.empty_cache()
     genuine = np.array([g for _, _, g in pairs])
     return eer(scores[genuine], scores[~genuine])
 
@@ -215,8 +286,25 @@ def train(args) -> None:
     print(f"best validation EER {100 * best:.2f}%", flush=True)
 
 
+DESCRIPTORS = MODEL_DIR / "descriptors"  # one float16 .npy per image, so scoring never describes twice
+
+
+def describe_images(net: nn.Module, rows: list[dict], root: Path, start: float) -> dict[str, torch.Tensor]:
+    DESCRIPTORS.mkdir(parents=True, exist_ok=True)
+    out, missing = {}, [r for r in rows if not (DESCRIPTORS / f"{r['image_id']}.npy").exists()]
+    for k in range(0, len(missing), 128):
+        chunk = missing[k : k + 128]
+        for row, patches in zip(chunk, load_image_patches(chunk, root)):
+            np.save(DESCRIPTORS / f"{row['image_id']}.npy", describe(net, patches).half().cpu().numpy())
+        print(f"described {min(k + 128, len(missing))} of {len(missing)} images, {time.time() - start:.0f}s", flush=True)
+    for row in rows:
+        out[row["image_id"]] = torch.from_numpy(np.load(DESCRIPTORS / f"{row['image_id']}.npy")).to(DEVICE)
+    return out
+
+
 def score(args) -> None:
-    """Scores for every pair of the full run, in its pair order, so the evaluation and fusion can pair them."""
+    """Scores for every pair of the full run, in its pair order, so the evaluation and fusion can pair them.
+    Pairs are grouped by probe; each probe is compared with its references a group at a time."""
     protocol, images = protocol_and_images()
     root = dataset_root(protocol)
     net = DescriptionNet(None).to(DEVICE)
@@ -226,18 +314,21 @@ def score(args) -> None:
                  for row in csv.DictReader(f)]
     rows = {r["image_id"]: r for r in images}
     needed = sorted({p["probe_image_id"] for p in pairs} | {p["reference_image_id"] for p in pairs})
-    start, descs = time.time(), {}
-    for k in range(0, len(needed), 64):
-        chunk = needed[k : k + 64]
-        for image_id, patches in zip(chunk, load_image_patches([rows[i] for i in chunk], root)):
-            descs[image_id] = describe(net, patches).half()
-        print(f"described {min(k + 64, len(needed))} of {len(needed)} images, {time.time() - start:.0f}s", flush=True)
-    out = []
-    for n, p in enumerate(pairs):
-        s = basic_scores(descs[p["probe_image_id"]].float(), descs[p["reference_image_id"]].float())
-        out.append({**p, "status": "ok", "reason": "", "score": s})
-        if (n + 1) % 50000 == 0:
-            print(f"scored {n + 1:,} of {len(pairs):,} pairs, {time.time() - start:.0f}s", flush=True)
+    start = time.time()
+    descs = describe_images(net, [rows[i] for i in needed], root, start)
+    torch.cuda.empty_cache()
+    out, began, done = [], time.time(), 0
+    with torch.no_grad():
+        for n, (probe, group) in enumerate(groupby(pairs, key=lambda p: p["probe_image_id"]), start=1):
+            group = list(group)
+            scores = batched_scores(descs[probe].float(), [descs[p["reference_image_id"]].float() for p in group])
+            out += [{**p, "status": "ok", "reason": "", "score": s} for p, s in zip(group, scores)]
+            done += len(group)
+            if n % 100 == 0:
+                rate = done / (time.time() - began)
+                finish = time.localtime(time.time() + (len(pairs) - done) / rate)
+                print(f"scored {done:,} of {len(pairs):,} pairs, {rate:.0f} pairs/s, expected finish {time.strftime('%H:%M', finish)}",
+                      flush=True)
     SCORES.parent.mkdir(parents=True, exist_ok=True)
     write_csv(SCORES, ("pair_id", "scenario", "kind", "frgp", "probe_image_id", "reference_image_id", "compact", "status", "reason", "score"), out)
     print(f"wrote {SCORES} in {time.time() - start:.0f}s", flush=True)

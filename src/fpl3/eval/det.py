@@ -12,10 +12,11 @@ from statistics import NormalDist
 
 import numpy as np
 
-SERIES = (("#2a78d6", "#3987e5"), ("#eb6834", "#d95926"), ("#1baf7a", "#199e70"))  # (light, dark)
+# (light, dark) palette slots in fixed order; for lines the first four pass the adjacent-pair checks
+SERIES = (("#2a78d6", "#3987e5"), ("#eb6834", "#d95926"), ("#1baf7a", "#199e70"), ("#eda100", "#c98500"))
 X_TICKS = (0.00001, 0.0001, 0.001, 0.01, 0.1, 0.5)
-Y_TICKS = (0.01, 0.02, 0.05, 0.1, 0.2, 0.4, 0.6, 0.8)
-X_RANGE, Y_RANGE = (0.00001, 0.5), (0.01, 0.9)
+Y_TICKS = (0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.4, 0.8)
+X_RANGE, Y_RANGE = (0.00001, 0.5), (0.001, 0.9)
 WIDTH, HEIGHT, LEFT, RIGHT, TOP, BOTTOM = 680, 520, 70, 150, 64, 58
 
 _probit = NormalDist().inv_cdf

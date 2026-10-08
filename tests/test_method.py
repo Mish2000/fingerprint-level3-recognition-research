@@ -61,6 +61,16 @@ def test_gpu_basic_score_matches_dahias_correspondences():
     assert descriptor.basic_scores(torch.tensor(a, dtype=torch.float64), torch.tensor(b, dtype=torch.float64)) == len(rows)
 
 
+def test_grouped_scores_equal_pair_by_pair_scores():
+    rng = np.random.default_rng(4)
+    probe = torch.tensor(rng.normal(size=(150, 16)))
+    references = [torch.tensor(rng.normal(size=(m, 16))) for m in (90, 0, 1, 200, 2, 140)]
+    references[3][:60] = probe[:60] + 0.2 * torch.tensor(rng.normal(size=(60, 16)))
+    expected = [descriptor.basic_scores(probe, r) for r in references]
+    assert descriptor.batched_scores(probe, references, budget=150 * 200 * 2) == expected
+    assert descriptor.batched_scores(probe[:1], references) == [descriptor.basic_scores(probe[:1], r) for r in references]
+
+
 def annotate_mutual_ratio(d1, d2, thr):
     """Dahia's find_correspondences with a ratio check, written out as in utils.py."""
     dist = (d1 * d1).sum(1)[:, None] - 2 * d1.astype(np.float64) @ d2.T + (d2 * d2).sum(1)[None, :]

@@ -1,6 +1,34 @@
-# Our method, part 1: a learned pore descriptor (design proposal)
+# Our method, part 1: a learned pore descriptor
 
-Status: **proposal, 2026-10-08**, awaiting the researcher's approval.
+Status: **approved and run, 2026-10-08** (results below).
+
+## Results on the test pairs (C1; 100 subjects never used for training, early stopping or fusion weights)
+
+TAR at FAR 0.1 % with 95 % subject-bootstrap intervals (runs/method/fusion/*/report.json):
+
+| | Rolled vs rolled (1,000 / 99,000) | Plain vs rolled (460 / 45,540) |
+|---|---|---|
+| OpenCV SIFT | 64.7 % [56.4, 74.8] | 64.6 % [53.7, 75.1] |
+| Pore SIFT | 76.5 % [72.9, 81.1] | 53.7 % [44.6, 62.1] |
+| Reference fusion of the two (step 0) | 87.4 % [83.5, 91.4] | 76.5 % [68.3, 84.3] |
+| **Learned pore descriptor alone** | **96.9 % [95.3, 98.1]** | **85.0 % [80.0, 90.5]** |
+| Learned + best existing (F4) | 98.0 % [97.0, 99.0] (+ Pore SIFT) | 88.9 % [84.0, 92.7] (+ OpenCV SIFT) |
+| Learned + both existing | 98.6 % [97.8, 99.4] | 91.5 % [87.3, 94.2] |
+
+- Against Pore SIFT, which differs only in the descriptor, the paired TAR gain at
+  FAR 0.1 % is +16.1 to +23.4 points (rolled) and +26.7 to +37.7 (plain).
+- F4 primary: FRR at FAR 0.1 % falls from 23.5 % to 2.0 % (rolled) and from
+  35.4 % to 11.1 % (plain); the paired intervals exclude zero by a wide margin.
+- EER of the learned descriptor alone: 1.46 % (rolled), 5.65 % (plain).
+- Fusion weights come from the 20 held-out development subjects; next to the
+  learned channel, Pore SIFT gets a negative weight (both count matches over the
+  same pores).
+- Training: 453,149 pore identities (1,064,023 patches) from 80 development
+  subjects; best validation EER 0.71 % at step 3,000, early stop at step 8,000,
+  about 15 minutes on the RTX 5080. Scoring all 582,724 pairs: 20 minutes.
+- Published deep fingerprint models report about 94-96 % TAR at FAR 0.1-0.01 %
+  on other SD302 subsets after training on external data; the protocols differ,
+  so the numbers are context, not a comparison.
 
 ## Goal and yardstick
 

@@ -77,8 +77,10 @@ manifests/     generated and committed: images.csv, pairs.csv, build_report.json
                f1_images.csv / f1_pairs.csv (F1 sample)
 src/fpl3/      data/ (SD302 readers, manifest, pairs, keyed-hash sampling, split, samples)
                algorithms/ (OpenCV SIFT wrapper; Pore SIFT driver + worker)
-               eval/ (AUC, TAR at FAR, summaries)
-               experiments/ (F1 gate, sample runs, timing pilots, full run)
+               eval/ (AUC, TAR at FAR, EER, DET, subject bootstrap)
+               experiments/ (F1 gate, sample runs, timing pilots, full run, evaluate)
+               method/ (our method: Q/J pores, pore-identity annotation, learned
+               descriptor on the GPU, score fusion)
 tests/         unit tests; integration tests marked `dataset`
 runs/, third_party/   local only, git-ignored (features, overlays, upstream checkouts)
 ```
@@ -97,6 +99,12 @@ python -m fpl3.data.build        # rebuild manifests (about 12 s, byte-identical
 python -m fpl3.experiments.f1    # F1 gate -> runs/f1 (refuses to overwrite)
 python -m fpl3.experiments.full_run            # full run -> runs/full; the same command resumes it
 python -m fpl3.experiments.full_run --status   # progress and expected finish (also runs/full/progress.html)
+python -m fpl3.experiments.evaluate            # E2-E4 on runs/full: EER, DET, bootstrap CIs, full and test pairs
+# Our method (docs/methods/learned-pore-descriptor.md); GPU steps run in fingerprint-level3-gpu
+# (PyTorch 2.13, CUDA 13.0, conda-forge; `pip install -e . --no-deps` there too)
+python -m fpl3.method.fusion                   # reference fusion of the existing algorithms (step 0)
+python -m fpl3.method.pores && python -m fpl3.method.annotate    # Q/J pores, pore identities
+python -m fpl3.method.descriptor train|score   # GPU environment
 pytest -m "not dataset"          # unit tests
 pytest                           # + integration tests against local SD302
 ```
@@ -142,9 +150,17 @@ pytest                           # + integration tests against local SD302
   chance-level scores; not included, no full run.
 - Bar on test pairs, TAR at FAR 0.1 % (runs/full/eval): rolled vs rolled Pore
   SIFT 76.5 % [72.9, 81.1]; plain vs rolled OpenCV SIFT 64.6 % [53.7, 75.1].
-- Awaiting approval: `docs/methods/learned-pore-descriptor.md` (our method, part
-  1), a GPU environment (PyTorch for the RTX 5080), and Q/J of development
-  subjects as training data.
+- Our method, part 1 (`docs/methods/learned-pore-descriptor.md`), approved
+  2026-10-08. Step 0, reference fusion of OpenCV SIFT and Pore SIFT on test
+  pairs, TAR at FAR 0.1 %: rolled vs rolled 87.4 % [83.5, 91.4], plain vs rolled
+  76.5 % [68.3, 84.3] (runs/method/fusion/reference). Annotation: 453,149 pore
+  identities, 1,064,023 patches from 80 training subjects; 20 development
+  subjects are held out for early stopping and fusion weights.
+- Learned pore descriptor on test pairs, TAR at FAR 0.1 %: alone 96.9 % (rolled)
+  and 85.0 % (plain); fused with the best existing algorithm (F4) 98.0 % and
+  88.9 %; with both existing algorithms 98.6 % and 91.5 %. Details and intervals
+  in `docs/methods/learned-pore-descriptor.md`. Descriptors and scores in
+  runs/method (local only).
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
