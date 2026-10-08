@@ -1,8 +1,22 @@
 # scikit-image Harris on the native image (eligibility note)
 
-Status: **F1 check, 2026-10-08**, decided by the assistant on the researcher's
-delegation. Whether it joins the comparison, which needs the exception below, is
-decided after the F1 result.
+Status: **F1 check done, 2026-10-08; not included in the comparison** (decided
+by the assistant on the researcher's delegation; decision record 2026-10-08).
+
+## F1 result (runs/f1-skimage-harris)
+
+- At the strictest threshold (no impostor accepted): rolled vs rolled TAR 0/20,
+  plain vs rolled TAR 0/20; on the same 400 pairs OpenCV SIFT accepted 19/20 and
+  14/20, Pore SIFT 18/20 and 13/20.
+- Genuine scores sit at chance level: median 3 inliers in both scenarios, which
+  is RANSAC's minimum sample (impostors: median 3, maximum 51).
+- The wrapper works as the example intends: a plain image against a copy of
+  itself shifted by (3, 2) px gives 204 inliers of 851 correspondences; the same
+  image against the rolled print of the same finger gives 3. Between two
+  impressions of a finger the windows no longer match, as the example's own
+  note on geometric distortions warns.
+- So no faster implementation and no full run: the pipeline cannot separate
+  genuine from impostor pairs on SD302.
 
 ## Identity
 

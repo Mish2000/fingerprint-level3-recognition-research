@@ -193,3 +193,8 @@ entries are not rewritten.
   is decided after that result.
 - **G3** scikit-image (0.26.0) and SciPy are added to the project environment
   from conda-forge.
+- **D1/D2a — scikit-image Harris, F1 result:** TAR 0/20 in UxV and RxV at the
+  strictest threshold; genuine scores at chance level (median 3 inliers, RANSAC's
+  minimum sample). It finds a shifted copy of an image (204 inliers) but no
+  correspondences between two impressions of a finger, as its documentation
+  warns. It stays at the F1 result: no faster implementation and no full run.

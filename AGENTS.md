@@ -138,8 +138,13 @@ pytest                           # + integration tests against local SD302
 - Approved 2026-10-08: our first own method is a fine-tuned learning model (D2
   entry); C1 is active (100/100 subjects; test pairs have both subjects in test:
   UxV 1,000 + 99,000, RxV 460 + 45,540). scikit-image Harris
-  (`docs/algorithms/skimage-harris.md`) runs unchanged on the F1 sample; a full
-  run would need a faster implementation of the same computation, decided after F1.
+  (`docs/algorithms/skimage-harris.md`) on F1: TAR 0/20 in both scenarios,
+  chance-level scores; not included, no full run.
+- Bar on test pairs, TAR at FAR 0.1 % (runs/full/eval): rolled vs rolled Pore
+  SIFT 76.5 % [72.9, 81.1]; plain vs rolled OpenCV SIFT 64.6 % [53.7, 75.1].
+- Awaiting approval: `docs/methods/learned-pore-descriptor.md` (our method, part
+  1), a GPU environment (PyTorch for the RTX 5080), and Q/J of development
+  subjects as training data.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
