@@ -168,3 +168,12 @@ entries are not rewritten.
   comparison type. The earlier 14.25 h came from a pilot with a larger share of
   plain vs rolled pairs than the full design.
 - **E2** TAR at FAR 0.01 % is reported as well, since the runtime allows it.
+
+## 2026-10-08 — threshold rule and the research's own methods
+
+- **E2** TAR at FAR x: a pair is accepted when its score is above the lowest
+  threshold at which at most a share x of the impostor pairs is accepted; a
+  failed comparison is never accepted (E1).
+- **D2** D2 binds the existing algorithms used for comparison. The research's
+  own methods are written and changed freely; the first is a machine-learning
+  model fine-tuned on development subjects only (R7).

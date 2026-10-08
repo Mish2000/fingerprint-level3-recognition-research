@@ -23,6 +23,8 @@ supervision. Discussion with the researcher is in Hebrew.
   (R1, R8). The dataset path lives only in `configs/protocol.toml`.
 - Call every algorithm by its name in chat, docs, file names and code; never
   use placeholder labels such as S1/S2.
+- The agent sets the order of work (researcher, 2026-10-08); time limits are
+  guidance, the aim is the strongest results.
 
 ## Data (verified 2026-10-05/06; see manifests/build_report.json)
 
@@ -130,9 +132,15 @@ pytest                           # + integration tests against local SD302
   wrote runs/full/report.json and scores/<algorithm>.csv. TAR at FAR 1 / 0.1 /
   0.01 %: rolled vs rolled OpenCV SIFT 86.9 / 67.9 / 44.0 %, Pore SIFT 84.4 /
   75.7 / 68.0 %; plain vs rolled OpenCV SIFT 79.0 / 58.4 / 36.7 %, Pore SIFT
-  65.0 / 53.3 / 44.1 %. Threshold rule (lowest threshold whose FAR does not
-  exceed the target) awaits the researcher's confirmation for decisions.md.
+  65.0 / 53.3 / 44.1 %.
 - Not built yet: EER, DET curves and subject-bootstrap confidence intervals (E2–E4).
+- Approved 2026-10-08: our first own method is a fine-tuned learning model (D2
+  entry). Awaiting the researcher: C1 activation (100/100 subjects; test pairs
+  have both subjects in test: UxV 1,000 + 99,000, RxV 460 + 45,540), and Harris
+  as an unchanged existing algorithm. OpenCV documents Harris only as a
+  detector; scikit-image documents two Harris pipelines. Its RANSAC example as
+  written would take about 124 days with 12 workers, so it needs an approved
+  faster implementation of the same computation.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
