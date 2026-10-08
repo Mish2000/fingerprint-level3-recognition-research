@@ -21,7 +21,9 @@ from ..data.build import write_csv
 from ..data.samples import f1_sample, pilot_sample
 from ..eval.metrics import summary
 from .common import REPO_ROOT, host, image_path, load_toml, new_run_dir, read_images, read_pairs, save_sample, workload, write_json
-from .sample_run import ALGORITHMS, run_opencv_sift, run_pore_sift
+from .sample_run import run_opencv_sift, run_pore_sift
+
+ALGORITHMS = ("opencv-sift", "pore-sift")  # the algorithms with a timing pilot so far
 
 SINGLE_THREAD_PAIRS = 200
 

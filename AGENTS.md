@@ -10,7 +10,8 @@ Evaluate existing fingerprint verification algorithms that are designed for
 ≥1000 ppi input on native 1000 ppi live-scan images from NIST SD302, then use
 the same data and evaluation layers to develop a new method that also uses
 Level-3 features (sweat pores). Researcher: Michael Sirkovich, under academic
-supervision. Discussion with the researcher is in Hebrew.
+supervision. Every reply to the researcher is in Hebrew (he asked repeatedly);
+code, docs and commits stay in English.
 
 ## Working rules
 
@@ -86,7 +87,7 @@ runs/, third_party/   local only, git-ignored (features, overlays, upstream chec
 
 ```bash
 # Project environment (conda-forge only; the Anaconda defaults channel is not used)
-conda create -n fingerprint-level3-recognition-research --override-channels -c conda-forge python=3.12 pip setuptools pytest numpy "opencv=4.13.0"
+conda create -n fingerprint-level3-recognition-research --override-channels -c conda-forge python=3.12 pip setuptools pytest numpy "opencv=4.13.0" "scikit-image=0.26.0"
 conda activate fingerprint-level3-recognition-research
 pip install -e . --no-deps --no-build-isolation
 # Pore SIFT environment: see environments/pore-sift-requirements.txt; upstream code
@@ -135,12 +136,10 @@ pytest                           # + integration tests against local SD302
   65.0 / 53.3 / 44.1 %.
 - Not built yet: EER, DET curves and subject-bootstrap confidence intervals (E2–E4).
 - Approved 2026-10-08: our first own method is a fine-tuned learning model (D2
-  entry). Awaiting the researcher: C1 activation (100/100 subjects; test pairs
-  have both subjects in test: UxV 1,000 + 99,000, RxV 460 + 45,540), and Harris
-  as an unchanged existing algorithm. OpenCV documents Harris only as a
-  detector; scikit-image documents two Harris pipelines. Its RANSAC example as
-  written would take about 124 days with 12 workers, so it needs an approved
-  faster implementation of the same computation.
+  entry); C1 is active (100/100 subjects; test pairs have both subjects in test:
+  UxV 1,000 + 99,000, RxV 460 + 45,540). scikit-image Harris
+  (`docs/algorithms/skimage-harris.md`) runs unchanged on the F1 sample; a full
+  run would need a faster implementation of the same computation, decided after F1.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.

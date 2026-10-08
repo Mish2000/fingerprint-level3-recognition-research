@@ -177,3 +177,19 @@ entries are not rewritten.
 - **D2** D2 binds the existing algorithms used for comparison. The research's
   own methods are written and changed freely; the first is a machine-learning
   model fine-tuned on development subjects only (R7).
+- **C1** Activated: 100 development and 100 test subjects, 46 with R images in
+  each, from the split fixed by the master seed. A development pair has both
+  subjects in development and a test pair both in test; pairs that mix the
+  halves are not used. Test pairs: UxV 1,000 genuine and 99,000 impostors; RxV
+  460 and 45,540. Anything learned or tuned uses development pairs (R7); the
+  research's own methods are compared with the existing algorithms on test pairs,
+  using the existing algorithms' full-run scores.
+- **D1/D2a — scikit-image Harris** (decided by the assistant on the researcher's
+  delegation): OpenCV documents Harris only as a corner detector; scikit-image's
+  example *Robust matching using RANSAC* is a complete Harris pipeline
+  (`docs/algorithms/skimage-harris.md`). As written it would need months for the
+  full design (B4), so it first runs unchanged on the F1 sample, as OpenCV SIFT
+  did. A faster implementation of the same computation, and with it a full run,
+  is decided after that result.
+- **G3** scikit-image (0.26.0) and SciPy are added to the project environment
+  from conda-forge.

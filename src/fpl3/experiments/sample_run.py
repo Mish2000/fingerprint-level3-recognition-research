@@ -15,12 +15,12 @@ from collections import defaultdict
 from multiprocessing import Pool
 from pathlib import Path
 
-from ..algorithms import opencv_sift, pore_sift
+from ..algorithms import opencv_sift, pore_sift, skimage_harris
 from ..data.build import write_csv
 from ..eval.metrics import no_false_accept_point
 from .common import REPO_ROOT, host, image_path, load_toml, new_run_dir, read_images, write_json
 
-ALGORITHMS = ("opencv-sift", "pore-sift")
+ALGORITHMS = ("opencv-sift", "pore-sift", "skimage-harris")
 SCORE_FIELDS = ("pair_id", "scenario", "kind", "frgp", "probe_image_id", "reference_image_id", "status", "reason", "score")
 
 
@@ -33,14 +33,24 @@ def read_sample(name: str) -> tuple[list[dict], list[dict]]:
     return [rows[i] for i in ids], pairs
 
 
-def run_opencv_sift(rows, pairs, dataset_root, features_dir, workers, seed):
-    with Pool(workers, initializer=opencv_sift.init_worker, initargs=(seed,)) as pool:
+def run_in_pool(module, rows, pairs, dataset_root, features_dir, workers, seed, chunksize=4):
+    """Extraction, then comparison, of an algorithm module with init_worker/extract_job/compare_job."""
+    with Pool(workers, initializer=module.init_worker, initargs=(seed,)) as pool:
         start = time.perf_counter()
-        extraction = pool.map(opencv_sift.extract_job, [(r["image_id"], image_path(r, dataset_root), str(features_dir)) for r in rows])
+        extraction = pool.map(module.extract_job, [(r["image_id"], image_path(r, dataset_root), str(features_dir)) for r in rows])
         middle = time.perf_counter()
-        comparisons = pool.map(opencv_sift.compare_job, [(p, str(features_dir)) for p in pairs], chunksize=4)
+        comparisons = pool.map(module.compare_job, [(p, str(features_dir)) for p in pairs], chunksize=chunksize)
         end = time.perf_counter()
     return extraction, comparisons, middle - start, end - middle
+
+
+def run_opencv_sift(rows, pairs, dataset_root, features_dir, workers, seed):
+    return run_in_pool(opencv_sift, rows, pairs, dataset_root, features_dir, workers, seed)
+
+
+def run_skimage_harris(rows, pairs, dataset_root, features_dir, workers, seed):
+    # a comparison takes minutes as written, so pairs are handed out one at a time
+    return run_in_pool(skimage_harris, rows, pairs, dataset_root, features_dir, workers, seed, chunksize=1)
 
 
 def run_pore_sift(rows, pairs, dataset_root, features_dir, workers, work_dir):
@@ -83,13 +93,19 @@ def main(argv: list[str] | None = None) -> None:
 
     protocol = load_toml("protocol.toml")
     dataset_root = Path(protocol["dataset"]["root"])
-    seed = opencv_sift.rng_seed(protocol["randomness"]["master_seed"])
+    master_seed = protocol["randomness"]["master_seed"]
     rows, pairs = read_sample(args.sample)
     run_dir = new_run_dir(args.out or REPO_ROOT / "runs" / f"{args.sample}-{args.algorithm}")
     features_dir = run_dir / "features"
     features_dir.mkdir()
     if args.algorithm == "opencv-sift":
-        extraction, comparisons, extract_wall, compare_wall = run_opencv_sift(rows, pairs, dataset_root, features_dir, args.workers, seed)
+        extraction, comparisons, extract_wall, compare_wall = run_opencv_sift(
+            rows, pairs, dataset_root, features_dir, args.workers, opencv_sift.rng_seed(master_seed)
+        )
+    elif args.algorithm == "skimage-harris":
+        extraction, comparisons, extract_wall, compare_wall = run_skimage_harris(
+            rows, pairs, dataset_root, features_dir, args.workers, skimage_harris.rng_seed(master_seed)
+        )
     else:
         extraction, comparisons, extract_wall, compare_wall = run_pore_sift(
             rows, pairs, dataset_root, features_dir, args.workers, run_dir / "work"
