@@ -125,12 +125,14 @@ pytest                           # + integration tests against local SD302
   TAR 19/20, FAR 0/180; plain vs rolled TAR 14/20, FAR 0/180.
 - Timing pilots (2026-10-07, 12 workers, both deterministic): OpenCV SIFT
   compact 0.42 h, full 8.0 h; Pore SIFT compact 1.83 h, full 6.25 h.
-- Full run approved (2026-10-07; B3, B4, E2 entries): both algorithms on all
-  582,724 pairs each, compact pairs first, about 15 h; `fpl3.experiments.full_run`
-  saves every finished chunk, resumes after an interruption and writes
-  runs/full/progress.html, report.json and scores/<algorithm>.csv. TAR at FAR
-  uses the lowest threshold at which FAR does not exceed the target; this rule
-  awaits the researcher's confirmation before it enters decisions.md.
+- Full run (2026-10-07 14:17 to 10-08 05:39, 15 h 22 min; B3, B4, E2): both
+  algorithms on all 582,724 pairs each, no failures; `fpl3.experiments.full_run`
+  wrote runs/full/report.json and scores/<algorithm>.csv. TAR at FAR 1 / 0.1 /
+  0.01 %: rolled vs rolled OpenCV SIFT 86.9 / 67.9 / 44.0 %, Pore SIFT 84.4 /
+  75.7 / 68.0 %; plain vs rolled OpenCV SIFT 79.0 / 58.4 / 36.7 %, Pore SIFT
+  65.0 / 53.3 / 44.1 %. Threshold rule (lowest threshold whose FAR does not
+  exceed the target) awaits the researcher's confirmation for decisions.md.
+- Not built yet: EER, DET curves and subject-bootstrap confidence intervals (E2–E4).
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
