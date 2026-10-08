@@ -161,6 +161,10 @@ pytest                           # + integration tests against local SD302
   88.9 %; with both existing algorithms 98.6 % and 91.5 %. Details and intervals
   in `docs/methods/learned-pore-descriptor.md`. Descriptors and scores in
   runs/method (local only).
+- Robustness check (second training seed, `--name repeat`): alone 98.1 % rolled,
+  88.9 % plain; fused with both existing algorithms 99.2 % and 93.9 %. Stopped
+  before part 2 (fine-tuned general vision model): the researcher first updates
+  the supervisor.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.

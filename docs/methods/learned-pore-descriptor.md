@@ -30,6 +30,22 @@ TAR at FAR 0.1 % with 95 % subject-bootstrap intervals (runs/method/fusion/*/rep
   on other SD302 subsets after training on external data; the protocols differ,
   so the numbers are context, not a comparison.
 
+### Repeat training with another seed (robustness check, 2026-10-08)
+
+Same data and recipe, training seed from the purpose `descriptor-training:repeat`
+(R5); runs/method/repeat, scores in learned-pore-repeat.csv. No subject overlaps
+between the 80 training, 20 validation and 100 test subjects (checked).
+
+| TAR at FAR 0.1 % | Rolled vs rolled | Plain vs rolled |
+|---|---|---|
+| First training (validation EER 0.71 %) | 96.9 % [95.3, 98.1] | 85.0 % [80.0, 90.5] |
+| Second training (validation EER 0.50 %) | 98.1 % [97.0, 99.1] | 88.9 % [85.1, 92.9] |
+| Second minus first, paired | +0.5 to +2.2 points | +1.2 to +6.4 points |
+| Second, fused with both existing algorithms | 99.2 % [98.4, 99.7] | 93.9 % [91.4, 96.0] |
+
+Both trainings stay far above the existing algorithms; the second, which the
+validation subjects would also have chosen, is slightly better.
+
 ## Goal and yardstick
 
 - F4 primary: fusing the Level-3 channel with the best existing algorithm lowers

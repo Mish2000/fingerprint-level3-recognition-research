@@ -94,7 +94,8 @@ def main(argv: list[str] | None = None) -> None:
                 "eer": {"value": v.eer(r), "ci": v.interval(boot[name]["eer"])},
                 "at_far": {f"{t * 100:g}%": {**point(r, t), "tar_ci": v.interval(boot[name][f"tar_at_{t!r}"])} for t in TARGETS},
             }
-            label = {**NAMES, "learned-pore": "Learned pore descriptor", "fusion": "Fusion"}.get(name, name)
+            label = {**NAMES, "learned-pore": "Learned pore descriptor", "learned-pore-repeat": "Learned pore descriptor, second training",
+                     "fusion": "Fusion"}.get(name, name)
             curves[label] = (r.far, r.frr)
             markers[label] = [(t, v.tar_at_far(r, t)["far"], v.tar_at_far(r, t)["frr"]) for t in TARGETS]
         for a, b in combinations(list(sets), 2):  # every pair, on the same subject draws (E4)

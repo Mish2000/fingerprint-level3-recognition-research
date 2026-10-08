@@ -10,6 +10,7 @@ validation EER of whole-print matching with their `basic` score (ratio 0.7).
 Runs in the fingerprint-level3-gpu environment:
     python -m fpl3.method.descriptor train
     python -m fpl3.method.descriptor score      # every full-run pair -> runs/method/scores/learned-pore.csv
+    python -m fpl3.method.descriptor train --name repeat   # another seed: runs/method/repeat, learned-pore-repeat.csv
 """
 
 from __future__ import annotations
@@ -36,8 +37,14 @@ from .data import DESCRIPTOR_DATA, METHOD_DIR, dataset_root, fingers, protocol_a
 from .pores import pore_file
 
 PATCH = 32
-MODEL_DIR = METHOD_DIR / "descriptor"
-SCORES = METHOD_DIR / "scores" / "learned-pore.csv"
+
+
+def run_paths(name: str) -> tuple[Path, Path, str]:
+    """Model folder, score file and training-seed purpose (R5) of a training run; 'descriptor' is the first run."""
+    if name == "descriptor":
+        return METHOD_DIR / "descriptor", METHOD_DIR / "scores" / "learned-pore.csv", "descriptor-training"
+    return METHOD_DIR / name, METHOD_DIR / "scores" / f"learned-pore-{name}.csv", f"descriptor-training:{name}"
+
 RATIO = 0.7  # validate.matching: "SIFT's original criterion with distance ratio check threshold of 0.7"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 torch.backends.cuda.matmul.allow_tf32 = False
@@ -233,7 +240,8 @@ def validation_eer(net, val) -> float:
 def train(args) -> None:
     protocol, images = protocol_and_images()
     _, validation = split_development(protocol, images)
-    seed = int(keyed_hash(protocol["randomness"]["master_seed"], "descriptor-training", "")[:8], 16)
+    model_dir, _, purpose = run_paths(args.name)
+    seed = int(keyed_hash(protocol["randomness"]["master_seed"], purpose, "")[:8], 16)
     torch.manual_seed(seed)
     generator = torch.Generator(device=DEVICE).manual_seed(seed)
     patches = torch.from_numpy(np.load(DESCRIPTOR_DATA / "train_patches.npy")).to(DEVICE)
@@ -250,7 +258,7 @@ def train(args) -> None:
     net = DescriptionNet(args.dropout).to(DEVICE)
     optimiser = torch.optim.SGD(net.parameters(), lr=args.learning_rate)
     per_batch = args.batch_size // 2  # two views per identity (balanced batches)
-    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    model_dir.mkdir(parents=True, exist_ok=True)
     log, best, faults, start = [], math.inf, 0, time.time()
     permutation, cursor = torch.randperm(identities, generator=generator, device=DEVICE), 0
     for step in range(1, args.steps + 1):
@@ -275,30 +283,28 @@ def train(args) -> None:
             print(f"step {step}: loss {float(loss.detach()):.4f}, validation EER {100 * value:.2f}%, {time.time() - start:.0f}s", flush=True)
             if value < best:
                 best, faults = value, 0
-                torch.save(net.state_dict(), MODEL_DIR / "model.pt")
+                torch.save(net.state_dict(), model_dir / "model.pt")
             else:
                 faults += 1
                 if faults >= args.tolerance:
                     print("early stop", flush=True)
                     break
-    (MODEL_DIR / "training.json").write_text(json.dumps({"best_validation_eer": best, "args": vars(args), "log": log}, indent=1),
+    (model_dir / "training.json").write_text(json.dumps({"best_validation_eer": best, "args": vars(args), "log": log}, indent=1),
                                             encoding="utf-8")
     print(f"best validation EER {100 * best:.2f}%", flush=True)
 
 
-DESCRIPTORS = MODEL_DIR / "descriptors"  # one float16 .npy per image, so scoring never describes twice
-
-
-def describe_images(net: nn.Module, rows: list[dict], root: Path, start: float) -> dict[str, torch.Tensor]:
-    DESCRIPTORS.mkdir(parents=True, exist_ok=True)
-    out, missing = {}, [r for r in rows if not (DESCRIPTORS / f"{r['image_id']}.npy").exists()]
+def describe_images(net: nn.Module, rows: list[dict], root: Path, start: float, folder: Path) -> dict[str, torch.Tensor]:
+    """Descriptors of every image, one float16 .npy each in `folder`, so scoring never describes twice."""
+    folder.mkdir(parents=True, exist_ok=True)
+    out, missing = {}, [r for r in rows if not (folder / f"{r['image_id']}.npy").exists()]
     for k in range(0, len(missing), 128):
         chunk = missing[k : k + 128]
         for row, patches in zip(chunk, load_image_patches(chunk, root)):
-            np.save(DESCRIPTORS / f"{row['image_id']}.npy", describe(net, patches).half().cpu().numpy())
+            np.save(folder / f"{row['image_id']}.npy", describe(net, patches).half().cpu().numpy())
         print(f"described {min(k + 128, len(missing))} of {len(missing)} images, {time.time() - start:.0f}s", flush=True)
     for row in rows:
-        out[row["image_id"]] = torch.from_numpy(np.load(DESCRIPTORS / f"{row['image_id']}.npy")).to(DEVICE)
+        out[row["image_id"]] = torch.from_numpy(np.load(folder / f"{row['image_id']}.npy")).to(DEVICE)
     return out
 
 
@@ -308,14 +314,15 @@ def score(args) -> None:
     protocol, images = protocol_and_images()
     root = dataset_root(protocol)
     net = DescriptionNet(None).to(DEVICE)
-    net.load_state_dict(torch.load(MODEL_DIR / "model.pt", map_location=DEVICE))
+    model_dir, scores_path, _ = run_paths(args.name)
+    net.load_state_dict(torch.load(model_dir / "model.pt", map_location=DEVICE))
     with open(REPO_ROOT / "runs" / "full" / "scores" / "pore-sift.csv", newline="", encoding="utf-8") as f:
         pairs = [{k: row[k] for k in ("pair_id", "scenario", "kind", "frgp", "probe_image_id", "reference_image_id", "compact")}
                  for row in csv.DictReader(f)]
     rows = {r["image_id"]: r for r in images}
     needed = sorted({p["probe_image_id"] for p in pairs} | {p["reference_image_id"] for p in pairs})
     start = time.time()
-    descs = describe_images(net, [rows[i] for i in needed], root, start)
+    descs = describe_images(net, [rows[i] for i in needed], root, start, model_dir / "descriptors")
     torch.cuda.empty_cache()
     out, began, done = [], time.time(), 0
     with torch.no_grad():
@@ -329,14 +336,15 @@ def score(args) -> None:
                 finish = time.localtime(time.time() + (len(pairs) - done) / rate)
                 print(f"scored {done:,} of {len(pairs):,} pairs, {rate:.0f} pairs/s, expected finish {time.strftime('%H:%M', finish)}",
                       flush=True)
-    SCORES.parent.mkdir(parents=True, exist_ok=True)
-    write_csv(SCORES, ("pair_id", "scenario", "kind", "frgp", "probe_image_id", "reference_image_id", "compact", "status", "reason", "score"), out)
-    print(f"wrote {SCORES} in {time.time() - start:.0f}s", flush=True)
+    scores_path.parent.mkdir(parents=True, exist_ok=True)
+    write_csv(scores_path, ("pair_id", "scenario", "kind", "frgp", "probe_image_id", "reference_image_id", "compact", "status", "reason", "score"), out)
+    print(f"wrote {scores_path} in {time.time() - start:.0f}s", flush=True)
 
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("command", choices=("train", "score"))
+    parser.add_argument("--name", default="descriptor", help="training run: model folder, score file and seed purpose")
     parser.add_argument("--learning-rate", type=float, default=1e-1)  # train.py defaults
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--steps", type=int, default=100000)
