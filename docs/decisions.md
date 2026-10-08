@@ -198,3 +198,12 @@ entries are not rewritten.
   minimum sample). It finds a shifted copy of an image (204 inliers) but no
   correspondences between two impressions of a finger, as its documentation
   warns. It stays at the F1 result: no faster implementation and no full run.
+- **F3/F4 — our method, part 1:** `docs/methods/learned-pore-descriptor.md`
+  approved: a reference fusion of the existing algorithms first, then Dahia &
+  Pamplona Segundo's learned pore descriptor trained on development subjects and
+  matched as in Pore SIFT. Harris is not part of it.
+- **B2/R7** Q and J of development subjects serve as training data for our
+  method; evaluation pairs stay UxV and RxV.
+- **G3** A third environment, `fingerprint-level3-gpu`, for GPU work: PyTorch
+  2.13 with CUDA 13.0 (the driver supports up to 13.1) from conda-forge. The GPU
+  is to be used as much as possible (researcher, 2026-10-08).
