@@ -100,6 +100,7 @@ python -m fpl3.experiments.f1    # F1 gate -> runs/f1 (refuses to overwrite)
 python -m fpl3.experiments.full_run            # full run -> runs/full; the same command resumes it
 python -m fpl3.experiments.full_run --status   # progress and expected finish (also runs/full/progress.html)
 python -m fpl3.experiments.evaluate            # E2-E4 on runs/full: EER, DET, bootstrap CIs, full and test pairs
+python -m fpl3.experiments.results_page        # one self-contained results page -> runs/results/results.html
 # Our method (docs/methods/learned-pore-descriptor.md); GPU steps run in fingerprint-level3-gpu
 # (PyTorch 2.13, CUDA 13.0, conda-forge; `pip install -e . --no-deps` there too)
 python -m fpl3.method.fusion                   # reference fusion of the existing algorithms (step 0)
