@@ -13,6 +13,14 @@ Level-3 features (sweat pores). Researcher: Michael Sirkovich, under academic
 supervision. Every reply to the researcher is in Hebrew (he asked repeatedly);
 code, docs and commits stay in English.
 
+Stage B (supervisor, 2026-10-10): a working system that takes in a print and
+searches, identifies and decides; accuracy proof on the full genuine and
+impostor pair sets; a background identification service with 3–4 non-AI and
+3–4 AI methods, each reported separately, then fused with system-recommended or
+user-chosen weights; further biometric modalities fused with the fingerprint
+results; a GUI. The order of these five tasks is agreed with the supervisor
+after the feasibility tests and the choice of methods (work order in Status).
+
 ## Working rules
 
 - Ask instead of assuming whenever a definition or constraint is ambiguous.
@@ -48,6 +56,8 @@ code, docs and commits stay in English.
   extraction (open source: check the code; closed SDK: vendor statement).
   Multi-scale analysis that includes the native resolution (SIFT) is fine.
   Documented 500-ppi designs (SourceAFIS, NBIS/MINDTCT, IDKit, id3, ...) fail.
+  Since 2026-10-10 the qualification binds our own methods too, learned ones
+  included: native ≥1000 ppi input, no reduction (500 ppi included).
 - D2: wrappers only, no change to algorithm code; D2a: components from
   different publications only if their authors document them together, else
   an explicitly approved exception; D2b: default parameters.
@@ -58,13 +68,12 @@ code, docs and commits stay in English.
 - Extract each image's template once and compare cached templates whenever the
   algorithm's official interface separates extraction from comparison.
 
-## Evaluation (to be built)
+## Evaluation
 
-Failures count at the lowest score (E1). TAR at FAR 1 % and 0.1 % from each
+Failures count at the lowest score (E1). TAR at FAR 1 / 0.1 / 0.01 % from each
 algorithm's own scores, EER, DET; 95 % CIs by subject bootstrap; paired
-comparisons on identical pairs (E2–E4). Anything tuned uses development
-subjects only (R7); the subject split is defined in `fpl3.data.split` but not
-active (C1).
+comparisons on identical pairs (E2–E4): `fpl3.experiments.evaluate`. Anything
+tuned uses development subjects only (R7); C1 is active (100/100 subjects).
 
 ## Layout
 
@@ -143,7 +152,6 @@ pytest                           # + integration tests against local SD302
   0.01 %: rolled vs rolled OpenCV SIFT 86.9 / 67.9 / 44.0 %, Pore SIFT 84.4 /
   75.7 / 68.0 %; plain vs rolled OpenCV SIFT 79.0 / 58.4 / 36.7 %, Pore SIFT
   65.0 / 53.3 / 44.1 %.
-- Not built yet: EER, DET curves and subject-bootstrap confidence intervals (E2–E4).
 - Approved 2026-10-08: our first own method is a fine-tuned learning model (D2
   entry); C1 is active (100/100 subjects; test pairs have both subjects in test:
   UxV 1,000 + 99,000, RxV 460 + 45,540). scikit-image Harris
@@ -163,9 +171,21 @@ pytest                           # + integration tests against local SD302
   in `docs/methods/learned-pore-descriptor.md`. Descriptors and scores in
   runs/method (local only).
 - Robustness check (second training seed, `--name repeat`): alone 98.1 % rolled,
-  88.9 % plain; fused with both existing algorithms 99.2 % and 93.9 %. Stopped
-  before part 2 (fine-tuned general vision model): the researcher first updates
-  the supervisor.
+  88.9 % plain; fused with both existing algorithms 99.2 % and 93.9 %. The
+  proposed part 2 (whole print at 500 ppi) was withdrawn on 2026-10-10 (D1).
+- Stage B work order (agent's decision, 2026-10-10). Every new method gets a
+  design note approved by the researcher before code, and all take native
+  1000 ppi input: (1) identification (1:N) measures and decision thresholds in
+  the evaluation, from the existing scores; (2) a fine-tuned general vision
+  model as pore descriptor, against the learned pore descriptor on the same
+  pores; (3) minutiae extracted at native 1000 ppi, matched with MCC; (4) a
+  learned minutia descriptor; (5) a hierarchical Level 2+3 matcher after Jain,
+  Chen & Demirkus (2007); (6) a whole-print vector at native resolution, also
+  the shortlist stage of 1:N search; (7) fusion of all methods, choice of
+  methods, accuracy proof. Then the five system tasks in the order agreed with
+  the supervisor; the Stage A workbench (`C:\fingerprint-research`: FastAPI,
+  React, PostgreSQL/pgvector, scanner import) is to be reviewed as the base.
+  SD302 also has 1000 ppi palms of the same subjects (sd302c, Q and J).
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.

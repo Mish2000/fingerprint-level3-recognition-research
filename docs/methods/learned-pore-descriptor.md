@@ -99,9 +99,9 @@ validation subjects would also have chosen, is slightly better.
 
 ## Later parts
 
-- Part 2: a fine-tuned general vision model as a fixed-length embedding of the
-  whole print (Level 1–2), the kind of model the supervisor asked about; then
-  fusion of every channel.
+- Part 2 as proposed (a fine-tuned general vision model on the whole print at
+  500 ppi) was withdrawn on 2026-10-10: our methods take native ≥1000 ppi input
+  (D1). The next methods follow the Stage B work order in AGENTS.md.
 
 ## Needs the researcher's approval
 

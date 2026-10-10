@@ -207,3 +207,12 @@ entries are not rewritten.
 - **G3** A third environment, `fingerprint-level3-gpu`, for GPU work: PyTorch
   2.13 with CUDA 13.0 (the driver supports up to 13.1) from conda-forge. The GPU
   is to be used as much as possible (researcher, 2026-10-08).
+
+## 2026-10-10 — native resolution for the research's own methods
+
+- **D1** The qualification now binds the research's own methods as well
+  (researcher, 2026-10-10): every method, learned or not, compares prints from
+  the native ≥1000 ppi image; a method that reduces the resolution before
+  feature extraction, to 500 ppi or otherwise, does not qualify. The proposed
+  part 2 of our method (a fine-tuned general vision model on the whole print at
+  500 ppi) is withdrawn.
