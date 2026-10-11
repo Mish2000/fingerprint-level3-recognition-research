@@ -17,8 +17,8 @@ Stage B (supervisor, 2026-10-10): a working system that takes in a print and
 searches, identifies and decides; accuracy proof on the full genuine and
 impostor pair sets; a background identification service with 3–4 non-AI and
 3–4 AI methods, each reported separately, then fused with system-recommended or
-user-chosen weights; further biometric modalities fused with the fingerprint
-results; a GUI. The order of these five tasks is agreed with the supervisor
+user-chosen weights; further biometric methods combined with the fingerprint
+results (what is meant is to be clarified with the supervisor); a GUI. The order of these five tasks is agreed with the supervisor
 after the feasibility tests and the choice of methods (work order in Status).
 
 ## Working rules
@@ -182,7 +182,11 @@ pytest                           # + integration tests against local SD302
   learned minutia descriptor; (5) a hierarchical Level 2+3 matcher after Jain,
   Chen & Demirkus (2007); (6) a whole-print vector at native resolution, also
   the shortlist stage of 1:N search; (7) fusion of all methods, choice of
-  methods, accuracy proof. Then the five system tasks in the order agreed with
+  methods, accuracy proof. Methods 2–6 have no known ready-made ≥1000 ppi
+  version that returns raw scores: each would be our own code (a published
+  method implemented by us, or a model we train). Open (2026-10-11): whether
+  that is acceptable for the non-AI methods; without it the non-AI side has
+  only OpenCV SIFT and Pore SIFT. Then the five system tasks in the order agreed with
   the supervisor; the Stage A workbench (`C:\fingerprint-research`: FastAPI,
   React, PostgreSQL/pgvector, scanner import) is to be reviewed as the base.
   SD302 also has 1000 ppi palms of the same subjects (sd302c, Q and J).
