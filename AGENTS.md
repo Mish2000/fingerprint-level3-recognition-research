@@ -131,11 +131,11 @@ pytest                           # + integration tests against local SD302
 
 ## Status
 
-- Public presentation (2026-10-16): this repository is the current research home;
-  `docs/research-projects.md` is the concise CV entry point for all five projects.
-  The researcher authorized publishing this documentation and the previous
-  October 10–11 updates, updating the other repositories' links, and archiving
-  `fingerprint-l3-benchmark` after preserving its old overview URL as a link.
+- Public presentation (done 2026-10-16, G2): this repository is the current
+  research home; `docs/research-projects.md` is the concise CV entry point for
+  all five projects. The other four READMEs link to it, the old CV URL
+  (`fingerprint-l3-benchmark/docs/research-projects.md`) now points here, and
+  `fingerprint-l3-benchmark` is archived as the historical SD300B study.
 - Done (2026-10-06): data layer — manifest, exclusions, UxV/RxV pairs,
   compact impostors, split definition, 24 passing tests.
 - Approved algorithms (2026-10-06), always called by name, never by labels:
