@@ -216,3 +216,22 @@ entries are not rewritten.
   feature extraction, to 500 ppi or otherwise, does not qualify. The proposed
   part 2 of our method (a fine-tuned general vision model on the whole print at
   500 ppi) is withdrawn.
+
+## 2026-10-16 — research overview and publication
+
+- **G2** The researcher approved publishing the concise research overview and
+  README updates across the five repositories, including the previously local
+  October 10–11 documentation. This repository is the current research home;
+  the previous Level-3 repository retains its evidence and an overview link
+  before archival. Existing CV links remain usable.
+- **D2/R7 — reporting correction:** the executed pore descriptor is trained
+  from random initialization in PyTorch, rather than fine-tuned from pretrained
+  descriptor weights. Its optimizer is SGD without weight decay. Automatic
+  annotation uses SIFT/RANSAC alignment, block matching and a local
+  moving-least-squares warp. The method note now describes that implementation;
+  the earlier design wording remains part of the historical record. This
+  correction authorizes no new experiment and changes no scores or protocol.
+- **E2–E4/R8** The overview presents the first training and second-seed check
+  separately, with their held-out pair counts and FAR targets. Publication
+  contains documentation and aggregate results only; research artifacts stay
+  local.

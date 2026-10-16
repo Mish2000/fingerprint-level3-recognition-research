@@ -80,7 +80,8 @@ tuned uses development subjects only (R7); C1 is active (100/100 subjects).
 ```
 configs/       protocol.toml (paths, seed, scenarios), exclusions.csv,
                algorithms.toml (environment paths and upstream pins)
-docs/          decisions.md — approved decisions with IDs; algorithms/ — eligibility notes
+docs/          research-projects.md — public research overview; decisions.md — approved
+               decisions with IDs; algorithms/ — eligibility notes
 environments/  pinned requirements of the separate Pore SIFT environment
 manifests/     generated and committed: images.csv, pairs.csv, build_report.json,
                f1_images.csv / f1_pairs.csv (F1 sample)
@@ -130,6 +131,11 @@ pytest                           # + integration tests against local SD302
 
 ## Status
 
+- Public presentation (2026-10-16): this repository is the current research home;
+  `docs/research-projects.md` is the concise CV entry point for all five projects.
+  The researcher authorized publishing this documentation and the previous
+  October 10–11 updates, updating the other repositories' links, and archiving
+  `fingerprint-l3-benchmark` after preserving its old overview URL as a link.
 - Done (2026-10-06): data layer — manifest, exclusions, UxV/RxV pairs,
   compact impostors, split definition, 24 passing tests.
 - Approved algorithms (2026-10-06), always called by name, never by labels:
@@ -152,8 +158,9 @@ pytest                           # + integration tests against local SD302
   0.01 %: rolled vs rolled OpenCV SIFT 86.9 / 67.9 / 44.0 %, Pore SIFT 84.4 /
   75.7 / 68.0 %; plain vs rolled OpenCV SIFT 79.0 / 58.4 / 36.7 %, Pore SIFT
   65.0 / 53.3 / 44.1 %.
-- Approved 2026-10-08: our first own method is a fine-tuned learning model (D2
-  entry); C1 is active (100/100 subjects; test pairs have both subjects in test:
+- Approved 2026-10-08: our first own method is a learned pore descriptor (D2;
+  implemented in PyTorch and trained from scratch, clarified 2026-10-16).
+  C1 is active (100/100 subjects; test pairs have both subjects in test:
   UxV 1,000 + 99,000, RxV 460 + 45,540). scikit-image Harris
   (`docs/algorithms/skimage-harris.md`) on F1: TAR 0/20 in both scenarios,
   chance-level scores; not included, no full run.
