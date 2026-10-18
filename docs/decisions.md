@@ -275,3 +275,16 @@ group H covers the Stage B system.
   named by the researcher. Its commits use the repository-local identity
   without co-author trailers. This repository stays the research home and the
   source of the methods.
+
+## 2026-10-18 — Stage B follow-up
+
+- **G4** Repository name: `multimodal-biometric-system`, at
+  `C:\multimodal-biometric-system`.
+- **H3** The supervisor leaves the design of the secret function to us; the
+  design recorded above stands and nothing about it is pending.
+- **H5** The build does not wait for the vendor: scanner integration goes
+  through TWAIN with 1000 ppi set programmatically and no driver dialog. The
+  FxISO SDK (now offered by DigitalPlatforms, which acquired Biometrika) is
+  requested in parallel and used only if it arrives.
+- Stage B proceeds one step at a time; each step is reported to the researcher
+  before the next starts.

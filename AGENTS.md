@@ -15,7 +15,7 @@ code, docs and commits stay in English.
 
 Stage B (supervisor meeting 2026-10-18, H1–H5 and G4; it replaces the
 2026-10-10 task list): only a system build, in its own public repository
-directly under `C:\` (name pending), embedding this repository's fingerprint
+`C:\multimodal-biometric-system`, embedding this repository's fingerprint
 methods. Login (email or username + password) → menu with fingerprint
 (primary), face and voice → enrolment, 1:1 verification and 1:N
 identification, with the algorithm chosen from short accuracy, speed and
@@ -35,7 +35,8 @@ compare stored templates, each in its method's native form.
 - Call every algorithm by its name in chat, docs, file names and code; never
   use placeholder labels such as S1/S2.
 - The agent sets the order of work (researcher, 2026-10-08); time limits are
-  guidance, the aim is the strongest results.
+  guidance, the aim is the strongest results. Stage B goes one step at a time,
+  each step reported before the next starts (researcher, 2026-10-18).
 
 ## Data (verified 2026-10-05/06; see manifests/build_report.json)
 
@@ -185,11 +186,14 @@ pytest                           # + integration tests against local SD302
 - Stage B (2026-10-18): the 2026-10-10 work order (new methods 2–6) is
   withdrawn. Approved stack and data handling in `docs/decisions.md` (H3, H4).
   Scanner: Biometrika HiScan PRO, which outputs 1000 ppi only when that
-  resolution is selected (default 500); its integration is designed anew (H5).
+  resolution is selected (default 500); integration through TWAIN with the
+  resolution set in code, the vendor SDK only if it arrives (H5).
   SD302 plain vs plain at native 1000 ppi exists only across devices (R and Q
   on the Crossmatch L SCAN against J on the Morpho TouchPrint, no thumbs):
-  1,275 genuine pairs, 649 of them on test subjects. Next: the repository
-  name, a system specification for the researcher's approval, feasibility checks.
+  1,275 genuine pairs, 649 of them on test subjects; NIST warns that some palm
+  captures (Q, J) do not show the labelled position, so a label audit against
+  V precedes any use. Proposed, awaiting approval: that run with J as reference.
+  Then feasibility checks and a system specification for the researcher's approval.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
