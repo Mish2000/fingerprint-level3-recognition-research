@@ -235,3 +235,43 @@ entries are not rewritten.
   separately, with their held-out pair counts and FAR targets. Publication
   contains documentation and aggregate results only; research artifacts stay
   local.
+
+## 2026-10-18 — Stage B: the identification system
+
+Approved by the researcher after the supervisor meeting of 2026-10-18. A new
+group H covers the Stage B system.
+
+- **H1** Stage B is a system build only. It embeds the fingerprint methods of
+  this repository and replaces the 2026-10-10 task list (3–4 non-AI and 3–4 AI
+  methods, accuracy proof on the full pair sets); the Stage B work order
+  recorded on 2026-10-10 is withdrawn. Fingerprint is the primary modality,
+  face and voice the further ones. Face and voice may use ready-made SDKs; D1
+  keeps binding the fingerprint methods. The system offers enrolment, 1:1
+  verification and 1:N identification.
+- **H2** Every method keeps its native template and comparison: the fingerprint
+  methods compare sets of local descriptors, face and voice one embedding each.
+  The supervisor's "decide by stored vectors" is met by storing every template
+  at enrolment and processing only the new sample at verification or
+  identification. Each method's template and comparison are described briefly
+  to the user.
+- **H3** National ID: asked once at registration, validated by its check digit
+  and never stored. A keyed hash (HMAC) serves duplicate checks and lookups; the
+  account links to a random identifier stored encrypted (AES-GCM) under a key
+  that our own function derives from a master secret and a per-record random
+  value. Keys stay outside the databases and the code; only standard
+  cryptographic primitives are used. The supervisor's confirmation of this
+  reading of "a secret function we write ourselves" is pending.
+- **H4** Stack: a React + TypeScript client packaged with Electron; a FastAPI
+  server (Python 3.12); one engine process per method in its own environment;
+  PostgreSQL with pgvector in two databases (accounts and identity link;
+  biometric data keyed only by the random identifier); raw samples and the
+  attempt history stored encrypted; OpenCV SFace with YuNet for face;
+  SpeechBrain ECAPA-TDNN for voice; the Python `cryptography` package for every
+  cryptographic primitive.
+- **H5** Scanner: Biometrika HiScan PRO at 1000 ppi (it outputs 500 ppi unless
+  1000 is selected). The integration is designed anew; the Stage A TWAIN helper
+  is not reused.
+- **G4** The system lives in a new public repository directly under `C:\`,
+  named by the researcher. Its commits use the repository-local identity
+  without co-author trailers. This repository stays the research home and the
+  source of the methods.

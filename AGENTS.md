@@ -13,19 +13,21 @@ Level-3 features (sweat pores). Researcher: Michael Sirkovich, under academic
 supervision. Every reply to the researcher is in Hebrew (he asked repeatedly);
 code, docs and commits stay in English.
 
-Stage B (supervisor, 2026-10-10): a working system that takes in a print and
-searches, identifies and decides; accuracy proof on the full genuine and
-impostor pair sets; a background identification service with 3–4 non-AI and
-3–4 AI methods, each reported separately, then fused with system-recommended or
-user-chosen weights; further biometric methods combined with the fingerprint
-results (what is meant is to be clarified with the supervisor); a GUI. The order of these five tasks is agreed with the supervisor
-after the feasibility tests and the choice of methods (work order in Status).
+Stage B (supervisor meeting 2026-10-18, H1–H5 and G4; it replaces the
+2026-10-10 task list): only a system build, in its own public repository
+directly under `C:\` (name pending), embedding this repository's fingerprint
+methods. Login (email or username + password) → menu with fingerprint
+(primary), face and voice → enrolment, 1:1 verification and 1:N
+identification, with the algorithm chosen from short accuracy, speed and
+how-it-works descriptions. Face and voice use ready-made SDKs. The national ID
+is never stored. Raw samples and every attempt are stored encrypted; decisions
+compare stored templates, each in its method's native form.
 
 ## Working rules
 
 - Ask instead of assuming whenever a definition or constraint is ambiguous.
   Do exactly what was approved; no unrequested reports or scope growth.
-- Every protocol choice has an ID in `docs/decisions.md` (R, A–G). Cite it in
+- Every protocol choice has an ID in `docs/decisions.md` (R, A–H). Cite it in
   code and commits; a change needs the researcher's approval and an appended
   entry in that file.
 - Never copy, modify or commit SD302 images, crops, templates or descriptors
@@ -180,23 +182,14 @@ pytest                           # + integration tests against local SD302
 - Robustness check (second training seed, `--name repeat`): alone 98.1 % rolled,
   88.9 % plain; fused with both existing algorithms 99.2 % and 93.9 %. The
   proposed part 2 (whole print at 500 ppi) was withdrawn on 2026-10-10 (D1).
-- Stage B work order (agent's decision, 2026-10-10). Every new method gets a
-  design note approved by the researcher before code, and all take native
-  1000 ppi input: (1) identification (1:N) measures and decision thresholds in
-  the evaluation, from the existing scores; (2) a fine-tuned general vision
-  model as pore descriptor, against the learned pore descriptor on the same
-  pores; (3) minutiae extracted at native 1000 ppi, matched with MCC; (4) a
-  learned minutia descriptor; (5) a hierarchical Level 2+3 matcher after Jain,
-  Chen & Demirkus (2007); (6) a whole-print vector at native resolution, also
-  the shortlist stage of 1:N search; (7) fusion of all methods, choice of
-  methods, accuracy proof. Methods 2–6 have no known ready-made ≥1000 ppi
-  version that returns raw scores: each would be our own code (a published
-  method implemented by us, or a model we train). Open (2026-10-11): whether
-  that is acceptable for the non-AI methods; without it the non-AI side has
-  only OpenCV SIFT and Pore SIFT. Then the five system tasks in the order agreed with
-  the supervisor; the Stage A workbench (`C:\fingerprint-research`: FastAPI,
-  React, PostgreSQL/pgvector, scanner import) is to be reviewed as the base.
-  SD302 also has 1000 ppi palms of the same subjects (sd302c, Q and J).
+- Stage B (2026-10-18): the 2026-10-10 work order (new methods 2–6) is
+  withdrawn. Approved stack and data handling in `docs/decisions.md` (H3, H4).
+  Scanner: Biometrika HiScan PRO, which outputs 1000 ppi only when that
+  resolution is selected (default 500); its integration is designed anew (H5).
+  SD302 plain vs plain at native 1000 ppi exists only across devices (R and Q
+  on the Crossmatch L SCAN against J on the Morpho TouchPrint, no thumbs):
+  1,275 genuine pairs, 649 of them on test subjects. Next: the repository
+  name, a system specification for the researcher's approval, feasibility checks.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
