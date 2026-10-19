@@ -13,15 +13,16 @@ Level-3 features (sweat pores). Researcher: Michael Sirkovich, under academic
 supervision. Every reply to the researcher is in Hebrew (he asked repeatedly);
 code, docs and commits stay in English.
 
-Stage B (supervisor meeting 2026-10-18, H1–H5 and G4; it replaces the
+Stage B (supervisor meeting 2026-10-18, H1–H6 and G4; it replaces the
 2026-10-10 task list): only a system build, in its own public repository
 `C:\multimodal-biometric-system`, embedding this repository's fingerprint
 methods. Login (email or username + password) → menu with fingerprint
 (primary), face and voice → enrolment, 1:1 verification and 1:N
-identification, with the algorithm chosen from short accuracy, speed and
-how-it-works descriptions. Face and voice use ready-made SDKs. The national ID
-is never stored. Raw samples and every attempt are stored encrypted; decisions
-compare stored templates, each in its method's native form.
+identification, both built as an impressive, interactive experience, with the
+algorithm chosen from short accuracy, speed and how-it-works descriptions
+written for a simple but curious user. Face and voice use ready-made SDKs. The
+national ID is never stored. Raw samples and every attempt are stored
+encrypted; decisions compare stored templates, each in its method's native form.
 
 ## Working rules
 
@@ -91,9 +92,10 @@ manifests/     generated and committed: images.csv, pairs.csv, build_report.json
 src/fpl3/      data/ (SD302 readers, manifest, pairs, keyed-hash sampling, split, samples)
                algorithms/ (OpenCV SIFT wrapper; Pore SIFT driver + worker)
                eval/ (AUC, TAR at FAR, EER, DET, subject bootstrap)
-               experiments/ (F1 gate, sample runs, timing pilots, full run, evaluate)
+               experiments/ (F1 gate, sample runs, timing pilots, full run, evaluate,
+               plain vs plain run and evaluation, label-audit check)
                method/ (our method: Q/J pores, pore-identity annotation, learned
-               descriptor on the GPU, score fusion)
+               descriptor on the GPU, score fusion, Q/J label audit)
 tests/         unit tests; integration tests marked `dataset`
 runs/, third_party/   local only, git-ignored (features, overlays, upstream checkouts)
 ```
@@ -124,6 +126,8 @@ python -m fpl3.experiments.timing_pilot --algorithm opencv-sift|pore-sift --desi
 python -m fpl3.experiments.plain_run --until extract   # missing Q/J features; without --until: every stage -> runs/plain
 python -m fpl3.method.audit                            # GPU environment: Q/J label audit against V (A5)
 python -m fpl3.experiments.audit_check                 # OpenCV SIFT check and side-by-side images of suspects
+python -m fpl3.method.descriptor score --name repeat --pairs plain   # GPU environment, after plain_run
+python -m fpl3.experiments.plain_eval                  # fusion, thresholds (R7), test TAR/FAR/FRR -> runs/plain/eval
 pytest -m "not dataset"          # unit tests (on Windows, add --basetemp inside a writable folder)
 pytest                           # + integration tests against local SD302
 ```
@@ -188,26 +192,46 @@ pytest                           # + integration tests against local SD302
 - Robustness check (second training seed, `--name repeat`): alone 98.1 % rolled,
   88.9 % plain; fused with both existing algorithms 99.2 % and 93.9 %. The
   proposed part 2 (whole print at 500 ppi) was withdrawn on 2026-10-10 (D1).
-- Stage B (2026-10-18): the 2026-10-10 work order (new methods 2–6) is
-  withdrawn. Approved stack and data handling in `docs/decisions.md` (H3, H4).
-  Scanner: Biometrika HiScan PRO, which outputs 1000 ppi only when that
-  resolution is selected (default 500); integration through TWAIN with the
-  resolution set in code, the vendor SDK only if it arrives (H5).
-  SD302 plain vs plain at native 1000 ppi exists only across devices (R and Q
-  on the Crossmatch L SCAN against J on the Morpho TouchPrint, no thumbs):
-  1,275 genuine pairs, 649 of them on test subjects; NIST warns that some palm
-  captures (Q, J) do not show the labelled position, so a label audit against
-  V precedes any use (A5). Approved 2026-10-19 with J as reference (B1–B4, R7).
-  Done 2026-10-19: timing pilots (12 workers, deterministic: OpenCV SIFT 52.7
-  and Pore SIFT 249 comparisons/s), missing features in runs/plain, and the
-  label audit (T = 17): Q 817 confirmed, 46 undetermined, 1 without own V;
-  J 988, 284, 3; no suspected label. Comparisons done 2026-10-19 (runs/plain,
-  runs/plain/eval). Test pairs, TAR at FAR 0.1 %: RxJ (226 genuine, 29,628
-  impostors) OpenCV SIFT 160, Pore SIFT 176, learned descriptor 215, all three
-  215; QxJ (423, 34,623) 288, 332, 395, 394. Development thresholds at a 0.1 %
-  target kept the test FAR below 0.1 % for every method; at 0.01 % the 1,584
-  validation impostors are too few for fusions (QxJ 18 false accepts). Next:
-  feasibility checks one at a time, then a system specification for approval.
+- Stage B decisions (2026-10-18/19): H1–H6 and G4 in `docs/decisions.md`; the
+  2026-10-10 work order (new methods 2–6) is withdrawn. The system repository
+  `C:\multimodal-biometric-system` does not exist yet. Scanner: Biometrika
+  HiScan PRO, 1000 ppi only when selected (default 500); integration through
+  TWAIN with the resolution set in code (H5). Checked 2026-10-19: .NET SDK 10
+  with the .NET Framework 4.8 targeting pack, Visual Studio Community 2026, the
+  32-bit TWAIN manager (twain_32.dll) and driver; the scanner was unplugged.
+  The vendor's FxISO SDK exists locally only as x64 DLLs without headers or
+  documentation; a request for FxISO SDK Light to DigitalPlatforms (Biometrika's
+  owner) was drafted on 2026-10-18, and sending it is the researcher's step.
+- Plain vs plain, done 2026-10-19 (B1–B4, R7, A5; runs/plain, runs/plain/eval):
+  SD302 has it only across devices (R and Q on the Crossmatch L SCAN against J
+  on the Morpho TouchPrint, no thumbs). Label audit (T = 17): Q 817 confirmed,
+  46 undetermined, 1 without its own V; J 988, 284, 3; none suspected, so none
+  excluded. Test pairs, TAR at FAR 0.1 %: RxJ (226 genuine, 29,628 impostors)
+  OpenCV SIFT 160, Pore SIFT 176, learned descriptor 215, all three 215; QxJ
+  (423, 34,623) 288, 332, 395, 394. Development thresholds at a 0.1 % target
+  kept the test FAR below 0.1 % for every method; at 0.01 % the validation
+  subjects' 1,584 impostors are too few for fusions (QxJ: 18 false accepts).
+  Times: OpenCV SIFT 42 min, Pore SIFT 8 min, learned descriptor 48 s.
+- Next step, proposed 2026-10-19 and awaiting approval: a scanner prototype —
+  the system repository's skeleton and a small C# tool (.NET Framework 4.8,
+  32-bit, NTwain from NuGet, whose download needs approval) that sets 1000 ppi
+  in code, captures without the driver dialog, saves lossless PNG marked
+  1000 ppi with a metadata file, and checks size and fine detail; fallback: the
+  driver's saved settings (TWAIN custom DS data). It needs the researcher at
+  the PC with the scanner; if he is away, face and voice feasibility goes first.
+- After it, one step at a time: the researcher captures a second set of his
+  ten fingers with the tool (his first set, one capture per finger, stays
+  outside the repository); our methods on those HiScan PRO captures (pores,
+  time per attempt, same finger against different fingers at the plain vs
+  plain thresholds); face and voice feasibility (OpenCV SFace with YuNet,
+  SpeechBrain ECAPA-TDNN; downloads need approval); then the system
+  specification for approval. Volunteers only if the supervisor wants accuracy
+  on the HiScan PRO itself (about 10 people for FAR 1 %, 20 for 0.1 %).
+- Awaiting the researcher: the go-ahead for the scanner prototype and the
+  NTwain download (or face and voice first); sending the FxISO SDK Light
+  request; the proposed system default (the learned descriptor alone at
+  FAR 0.1 %, fusions offered as options).
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
-- Do not push to GitHub until the researcher asks.
+- Do not push to GitHub until the researcher asks; the commits made since
+  2026-10-18 are local only.

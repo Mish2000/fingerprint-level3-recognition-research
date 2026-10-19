@@ -328,3 +328,41 @@ features and the label audit run now; the comparisons follow a report.
   SIFT for Q and J of test subjects. R features and the development Q and J
   pore detections are reused from the full run and from `runs/method/pores`
   (same worker, settings and model).
+
+## 2026-10-19 — plain vs plain comparisons
+
+- **B4** After the report of the pilots, the missing features and the label
+  audit, the researcher approved the comparisons together with their
+  thresholds, fusion weights and test results. Projection: OpenCV SIFT about
+  40 min, Pore SIFT about 9 min, the learned pore descriptor 2–3 min on the
+  GPU; they took 42 min, 8 min and 48 s.
+- **A5** The audit found no suspected label, so no Q or J image is excluded;
+  the 330 undetermined images and the 4 whose own V is excluded stay in.
+- **H6/R7** The plain vs plain scenarios score the learned pore descriptor's
+  second training only, the one the validation subjects chose; its first
+  training is not scored on them.
+
+## 2026-10-18 — defaults for the system specification (recorded 2026-10-19)
+
+- **H6** Approved with the researcher's general approval of the plan on
+  2026-10-18 and open to change in the specification:
+  - enrolment stores templates for every algorithm of a modality, and the
+    algorithm is chosen at verification or identification, so switching
+    algorithms or choosing a fusion needs no new enrolment;
+  - fingerprint enrolment: the user chooses the finger, which is captured three
+    times as a quality check;
+  - the system's learned pore descriptor is its second training;
+  - each algorithm decides at FAR 0.1 % with a threshold from SD302
+    development pairs until it is checked on the HiScan PRO;
+  - fusion uses the weights recommended by the research, or weights the user
+    chooses that sum to 100 (the supervisor's suggestion of June 2026);
+  - every attempt is stored (time, modality, algorithm, score, threshold,
+    decision, duration and the encrypted sample), and an administrator screen
+    shows the history without national IDs;
+  - SD302 images never enter the system's databases (R1, R8); demonstrations
+    use real captures;
+  - no liveness detection, as decided for the research (F5);
+  - the user interface is in Hebrew;
+  - 1:1 verification and 1:N identification are both built as an impressive,
+    interactive experience, and the texts are written for a simple but curious
+    user (researcher, 2026-10-18).
