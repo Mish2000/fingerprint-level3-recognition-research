@@ -366,3 +366,10 @@ features and the label audit run now; the comparisons follow a report.
   - 1:1 verification and 1:N identification are both built as an impressive,
     interactive experience, and the texts are written for a simple but curious
     user (researcher, 2026-10-18).
+
+## 2026-10-19 — the system repository
+
+- **G4** The researcher approved the scanner prototype and the NTwain download
+  on 2026-10-19, and `C:\multimodal-biometric-system` was created (local only).
+  Its `docs/decisions.md` carries H1–H6 and G4 over; system decisions from H7
+  on are recorded there and no longer here.

@@ -194,11 +194,10 @@ pytest                           # + integration tests against local SD302
   proposed part 2 (whole print at 500 ppi) was withdrawn on 2026-10-10 (D1).
 - Stage B decisions (2026-10-18/19): H1–H6 and G4 in `docs/decisions.md`; the
   2026-10-10 work order (new methods 2–6) is withdrawn. The system repository
-  `C:\multimodal-biometric-system` does not exist yet. Scanner: Biometrika
-  HiScan PRO, 1000 ppi only when selected (default 500); integration through
-  TWAIN with the resolution set in code (H5). Checked 2026-10-19: .NET SDK 10
-  with the .NET Framework 4.8 targeting pack, Visual Studio Community 2026, the
-  32-bit TWAIN manager (twain_32.dll) and driver; the scanner was unplugged.
+  `C:\multimodal-biometric-system` exists since 2026-10-19 (local only); it
+  carries H1–H6 and G4 over, and system decisions from H7 on are recorded
+  there. Scanner: Biometrika HiScan PRO, 1000 ppi only when selected (default
+  500); integration through TWAIN with the resolution set in code (H5).
   The vendor's FxISO SDK exists locally only as x64 DLLs without headers or
   documentation; a request for FxISO SDK Light to DigitalPlatforms (Biometrika's
   owner) was drafted on 2026-10-18, and sending it is the researcher's step.
@@ -212,25 +211,28 @@ pytest                           # + integration tests against local SD302
   kept the test FAR below 0.1 % for every method; at 0.01 % the validation
   subjects' 1,584 impostors are too few for fusions (QxJ: 18 false accepts).
   Times: OpenCV SIFT 42 min, Pore SIFT 8 min, learned descriptor 48 s.
-- Next step, proposed 2026-10-19 and awaiting approval: a scanner prototype —
-  the system repository's skeleton and a small C# tool (.NET Framework 4.8,
-  32-bit, NTwain from NuGet, whose download needs approval) that sets 1000 ppi
-  in code, captures without the driver dialog, saves lossless PNG marked
-  1000 ppi with a metadata file, and checks size and fine detail; fallback: the
-  driver's saved settings (TWAIN custom DS data). It needs the researcher at
-  the PC with the scanner; if he is away, face and voice feasibility goes first.
-- After it, one step at a time: the researcher captures a second set of his
-  ten fingers with the tool (his first set, one capture per finger, stays
+- Scanner prototype, approved 2026-10-19 with the NTwain download (H7 in the
+  system repository): the skeleton and the capture tool (C#, .NET Framework
+  4.8, x86, NTwain 3.7.6) are built and tested without scanning; its checks
+  reproduce the 2026-10-18 analysis of the researcher's ten first captures
+  exactly. A probe of the plugged-in scanner showed that its TWAIN driver
+  ("TWAIN Biometrika Driver" 2.2) offers only 500 ppi and refuses 1000, with no
+  saved settings (CAP_CUSTOMDSDATA); its own window offers "Save 1000 DPI...".
+  So the approved route and its fallback are blocked; the route to 1000 ppi
+  awaits the researcher.
+- Then, one step at a time: the researcher captures a second set of his
+  ten fingers at 1000 ppi (his first set, one capture per finger, stays
   outside the repository); our methods on those HiScan PRO captures (pores,
   time per attempt, same finger against different fingers at the plain vs
   plain thresholds); face and voice feasibility (OpenCV SFace with YuNet,
   SpeechBrain ECAPA-TDNN; downloads need approval); then the system
   specification for approval. Volunteers only if the supervisor wants accuracy
   on the HiScan PRO itself (about 10 people for FAR 1 %, 20 for 0.1 %).
-- Awaiting the researcher: the go-ahead for the scanner prototype and the
-  NTwain download (or face and voice first); sending the FxISO SDK Light
-  request; the proposed system default (the learned descriptor alone at
-  FAR 0.1 %, fusions offered as options).
+- Awaiting the researcher: the route to 1000 ppi (vendor request with the exact
+  question, a capture through the driver's own window tried at the scanner;
+  the undocumented OEM library is not recommended); sending the vendor request;
+  the proposed system default (the learned descriptor alone at FAR 0.1 %,
+  fusions offered as options).
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks; the commits made since
