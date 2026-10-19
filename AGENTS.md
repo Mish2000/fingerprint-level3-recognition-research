@@ -199,8 +199,9 @@ pytest                           # + integration tests against local SD302
   there. Scanner: Biometrika HiScan PRO, 1000 ppi only when selected (default
   500); integration through TWAIN with the resolution set in code (H5).
   The vendor's FxISO SDK exists locally only as x64 DLLs without headers or
-  documentation; a request for FxISO SDK Light to DigitalPlatforms (Biometrika's
-  owner) was drafted on 2026-10-18, and sending it is the researcher's step.
+  documentation; the request for FxISO SDK Light to DigitalPlatforms
+  (Biometrika's owner), drafted on 2026-10-18, has been sent by the researcher
+  (reported on 2026-10-19); no reply yet.
 - Plain vs plain, done 2026-10-19 (B1–B4, R7, A5; runs/plain, runs/plain/eval):
   SD302 has it only across devices (R and Q on the Crossmatch L SCAN against J
   on the Morpho TouchPrint, no thumbs). Label audit (T = 17): Q 817 confirmed,
@@ -228,11 +229,11 @@ pytest                           # + integration tests against local SD302
   SpeechBrain ECAPA-TDNN; downloads need approval); then the system
   specification for approval. Volunteers only if the supervisor wants accuracy
   on the HiScan PRO itself (about 10 people for FAR 1 %, 20 for 0.1 %).
-- Awaiting the researcher: the route to 1000 ppi (vendor request with the exact
-  question, a capture through the driver's own window tried at the scanner;
-  the undocumented OEM library is not recommended); sending the vendor request;
-  the proposed system default (the learned descriptor alone at FAR 0.1 %,
-  fusions offered as options).
+- Awaiting the researcher: the route to 1000 ppi (the vendor's reply to the
+  request already sent; a capture through the driver's own window, tried at
+  the scanner; the undocumented OEM library is not recommended); the proposed
+  system default (the learned descriptor alone at FAR 0.1 %, fusions offered
+  as options).
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks; the commits made since
