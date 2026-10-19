@@ -117,6 +117,7 @@ def write_results(ctx: full_run.Context, progress: full_run.Progress, stage: ful
     for p in sorted(stage.items, key=lambda p: (p["scenario"], p["half"], p["frgp"], p["probe_image_id"], p["reference_image_id"])):
         r = scores[p["pair_id"]]
         rows.append({**{k: p[k] for k in SCORE_FIELDS[:7]}, "status": r["status"], "reason": r["reason"], "score": r["score"]})
+    (ctx.run_dir / "scores").mkdir(parents=True, exist_ok=True)
     write_csv(ctx.run_dir / "scores" / f"{stage.algorithm}.csv", SCORE_FIELDS, rows)
     write_json(path, report)
     full_run.log(ctx.run_dir, f"{stage.name}: results written to report.json")

@@ -65,6 +65,44 @@ def test_label_audit_rules():
     assert lonely["category"] == "no_reference" and lonely["own_score"] == ""
 
 
+def test_a_plain_run_writes_its_results_and_scores(tmp_path, monkeypatch):
+    import csv
+    import json
+    import time
+
+    from fpl3.experiments import full_run
+    from fpl3.experiments.common import write_json
+
+    monkeypatch.setattr(full_run, "CHUNK_SIZE", {key: 3 for key in full_run.CHUNK_SIZE})
+    monkeypatch.setattr(plain_run, "REUSE", {"opencv-sift": {}, "pore-sift": {}})
+    rows = [{"image_id": f"{s}_{n:08d}_02", "set": s, "subject": f"{n:08d}", "frgp": "2"} for s in "RJ" for n in range(4)]
+    half = {"00000000": "development", "00000001": "development", "00000002": "test", "00000003": "test"}
+    pairs = [{"pair_id": f"RxJ:{p['image_id']}:{j['image_id']}", "scenario": "RxJ", "half": half[p["subject"]],
+              "kind": "genuine" if p["subject"] == j["subject"] else "impostor", "frgp": 2,
+              "probe_image_id": p["image_id"], "reference_image_id": j["image_id"],
+              "probe_subject": p["subject"], "reference_subject": j["subject"]}
+             for p in rows if p["set"] == "R" for j in rows if j["set"] == "J" and half[p["subject"]] == half[j["subject"]]]
+
+    def executor(stage, todo, ctx, on_done, tick):
+        for index, chunk in todo:
+            results = ([{"image_id": r["image_id"]} for r in chunk] if stage.kind == "extract" else
+                       [{"pair_id": p["pair_id"], "status": "ok", "reason": "", "score": 20 if p["kind"] == "genuine" else 1} for p in chunk])
+            on_done(index, results, time.time(), time.time() + 0.1)
+
+    stages = plain_run.build_stages(rows, pairs)
+    ctx = full_run.Context(tmp_path, tmp_path, 2, 0, {})
+    write_json(tmp_path / "report.json", {"algorithms": {}})
+    progress = full_run.Progress(tmp_path, stages, 2, time.time(), page=plain_run.PAGE)
+    full_run.execute(ctx, stages, progress, {"opencv-sift": executor, "pore-sift": executor},
+                     after_stage=lambda stage: plain_run.write_results(ctx, progress, stage))
+    report = json.loads((tmp_path / "report.json").read_text(encoding="utf-8"))
+    for algorithm in ("opencv-sift", "pore-sift"):
+        test = report["algorithms"][algorithm]["test"]["RxJ"]["at_far"]["1%"]
+        assert (test["genuine"], test["true_accepts"], test["impostor"]) == (2, 2, 2)
+        with open(tmp_path / "scores" / f"{algorithm}.csv", newline="", encoding="utf-8") as f:
+            assert len(list(csv.DictReader(f))) == len(pairs) == 8
+
+
 def scores_of(genuine, impostor):
     from fpl3.eval import verification as v
 
