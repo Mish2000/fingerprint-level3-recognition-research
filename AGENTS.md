@@ -201,9 +201,13 @@ pytest                           # + integration tests against local SD302
   Done 2026-10-19: timing pilots (12 workers, deterministic: OpenCV SIFT 52.7
   and Pore SIFT 249 comparisons/s), missing features in runs/plain, and the
   label audit (T = 17): Q 817 confirmed, 46 undetermined, 1 without own V;
-  J 988, 284, 3; no suspected label. Next, after the researcher's go-ahead:
-  the comparisons, thresholds and fusion weights (R7). Then feasibility checks
-  and a system specification for the researcher's approval.
+  J 988, 284, 3; no suspected label. Comparisons done 2026-10-19 (runs/plain,
+  runs/plain/eval). Test pairs, TAR at FAR 0.1 %: RxJ (226 genuine, 29,628
+  impostors) OpenCV SIFT 160, Pore SIFT 176, learned descriptor 215, all three
+  215; QxJ (423, 34,623) 288, 332, 395, 394. Development thresholds at a 0.1 %
+  target kept the test FAR below 0.1 % for every method; at 0.01 % the 1,584
+  validation impostors are too few for fusions (QxJ 18 false accepts). Next:
+  feasibility checks one at a time, then a system specification for approval.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
