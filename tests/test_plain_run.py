@@ -1,6 +1,8 @@
 import math
 from collections import Counter
 
+import numpy as np
+
 from fpl3.data.samples import development_subjects, pilot_sample_plain
 from fpl3.experiments import plain_run
 from fpl3.experiments.common import read_images
@@ -61,6 +63,22 @@ def test_label_audit_rules():
     assert (record["best_other_image_id"], record["best_other_same_subject"]) == ("V_B_03", 0)
     lonely = label_audit.classify(row, list(zip(candidates[1:], [5, 3, 2])), 10)
     assert lonely["category"] == "no_reference" and lonely["own_score"] == ""
+
+
+def scores_of(genuine, impostor):
+    from fpl3.eval import verification as v
+
+    g, i = np.array(genuine, float), np.array(impostor, float)
+    return v.Scores(g, np.zeros(len(g), int), i, np.zeros(len(i), int), np.zeros(len(i), int), 1)
+
+
+def test_operational_threshold_comes_from_the_fit_pairs_only():
+    from fpl3.experiments.plain_eval import operational
+
+    fit = scores_of([5, 9, 12], [0] * 98 + [7, 10])  # at FAR 1 %, one of 100 impostors may pass: threshold 7
+    r = operational(fit, scores_of([8, 6, 20, -np.inf], [7.5, 3, 11, 7]), 0.01)
+    assert r["accept_if_score_above"] == 7
+    assert (r["true_accepts"], r["genuine"], r["false_accepts"], r["impostor"]) == (2, 4, 2, 4)
 
 
 def test_pore_file_falls_back_to_the_plain_run(tmp_path, monkeypatch):

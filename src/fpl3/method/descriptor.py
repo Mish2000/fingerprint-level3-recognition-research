@@ -11,6 +11,7 @@ Runs in the fingerprint-level3-gpu environment:
     python -m fpl3.method.descriptor train
     python -m fpl3.method.descriptor score      # every full-run pair -> runs/method/scores/learned-pore.csv
     python -m fpl3.method.descriptor train --name repeat   # another seed: runs/method/repeat, learned-pore-repeat.csv
+    python -m fpl3.method.descriptor score --name repeat --pairs plain   # plain vs plain pairs -> learned-pore-repeat-plain.csv
 """
 
 from __future__ import annotations
@@ -308,17 +309,27 @@ def describe_images(net: nn.Module, rows: list[dict], root: Path, start: float, 
     return out
 
 
+PAIR_SOURCES = {  # whose pair list (and order) the scores follow
+    "full": REPO_ROOT / "runs" / "full" / "scores" / "pore-sift.csv",
+    "plain": REPO_ROOT / "runs" / "plain" / "scores" / "pore-sift.csv",  # decision record 2026-10-19
+}
+
+
 def score(args) -> None:
-    """Scores for every pair of the full run, in its pair order, so the evaluation and fusion can pair them.
-    Pairs are grouped by probe; each probe is compared with its references a group at a time."""
+    """Scores for every pair of the full run (or of the plain vs plain run), in its pair order, so the
+    evaluation and fusion can pair them. Pairs are grouped by probe; each probe is compared with its
+    references a group at a time."""
     protocol, images = protocol_and_images()
     root = dataset_root(protocol)
     net = DescriptionNet(None).to(DEVICE)
     model_dir, scores_path, _ = run_paths(args.name)
+    if args.pairs != "full":
+        scores_path = scores_path.with_name(f"{scores_path.stem}-{args.pairs}.csv")
     net.load_state_dict(torch.load(model_dir / "model.pt", map_location=DEVICE))
-    with open(REPO_ROOT / "runs" / "full" / "scores" / "pore-sift.csv", newline="", encoding="utf-8") as f:
-        pairs = [{k: row[k] for k in ("pair_id", "scenario", "kind", "frgp", "probe_image_id", "reference_image_id", "compact")}
-                 for row in csv.DictReader(f)]
+    with open(PAIR_SOURCES[args.pairs], newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        fields = [k for k in reader.fieldnames if k not in ("status", "reason", "score")]
+        pairs = [{k: row[k] for k in fields} for row in reader]
     rows = {r["image_id"]: r for r in images}
     needed = sorted({p["probe_image_id"] for p in pairs} | {p["reference_image_id"] for p in pairs})
     start = time.time()
@@ -337,7 +348,7 @@ def score(args) -> None:
                 print(f"scored {done:,} of {len(pairs):,} pairs, {rate:.0f} pairs/s, expected finish {time.strftime('%H:%M', finish)}",
                       flush=True)
     scores_path.parent.mkdir(parents=True, exist_ok=True)
-    write_csv(scores_path, ("pair_id", "scenario", "kind", "frgp", "probe_image_id", "reference_image_id", "compact", "status", "reason", "score"), out)
+    write_csv(scores_path, (*fields, "status", "reason", "score"), out)
     print(f"wrote {scores_path} in {time.time() - start:.0f}s", flush=True)
 
 
@@ -345,6 +356,7 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("command", choices=("train", "score"))
     parser.add_argument("--name", default="descriptor", help="training run: model folder, score file and seed purpose")
+    parser.add_argument("--pairs", choices=tuple(PAIR_SOURCES), default="full", help="score: which run's pairs")
     parser.add_argument("--learning-rate", type=float, default=1e-1)  # train.py defaults
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--steps", type=int, default=100000)
