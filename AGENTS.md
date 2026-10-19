@@ -197,10 +197,13 @@ pytest                           # + integration tests against local SD302
   on the Crossmatch L SCAN against J on the Morpho TouchPrint, no thumbs):
   1,275 genuine pairs, 649 of them on test subjects; NIST warns that some palm
   captures (Q, J) do not show the labelled position, so a label audit against
-  V precedes any use (A5). Approved 2026-10-19 with J as reference (B1–B4, R7):
-  timing pilot, missing features and label audit first, then a report; the
-  comparisons start only after it. Then feasibility checks and a system
-  specification for the researcher's approval.
+  V precedes any use (A5). Approved 2026-10-19 with J as reference (B1–B4, R7).
+  Done 2026-10-19: timing pilots (12 workers, deterministic: OpenCV SIFT 52.7
+  and Pore SIFT 249 comparisons/s), missing features in runs/plain, and the
+  label audit (T = 17): Q 817 confirmed, 46 undetermined, 1 without own V;
+  J 988, 284, 3; no suspected label. Next, after the researcher's go-ahead:
+  the comparisons, thresholds and fusion weights (R7). Then feasibility checks
+  and a system specification for the researcher's approval.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.
