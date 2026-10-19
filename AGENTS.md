@@ -119,7 +119,12 @@ python -m fpl3.experiments.results_page        # one self-contained results page
 python -m fpl3.method.fusion                   # reference fusion of the existing algorithms (step 0)
 python -m fpl3.method.pores && python -m fpl3.method.annotate    # Q/J pores, pore identities
 python -m fpl3.method.descriptor train|score   # GPU environment
-pytest -m "not dataset"          # unit tests
+# Plain vs plain (RxJ, QxJ; decision record 2026-10-19)
+python -m fpl3.experiments.timing_pilot --algorithm opencv-sift|pore-sift --design plain
+python -m fpl3.experiments.plain_run --until extract   # missing Q/J features; without --until: every stage -> runs/plain
+python -m fpl3.method.audit                            # GPU environment: Q/J label audit against V (A5)
+python -m fpl3.experiments.audit_check                 # OpenCV SIFT check and side-by-side images of suspects
+pytest -m "not dataset"          # unit tests (on Windows, add --basetemp inside a writable folder)
 pytest                           # + integration tests against local SD302
 ```
 
@@ -192,8 +197,10 @@ pytest                           # + integration tests against local SD302
   on the Crossmatch L SCAN against J on the Morpho TouchPrint, no thumbs):
   1,275 genuine pairs, 649 of them on test subjects; NIST warns that some palm
   captures (Q, J) do not show the labelled position, so a label audit against
-  V precedes any use. Proposed, awaiting approval: that run with J as reference.
-  Then feasibility checks and a system specification for the researcher's approval.
+  V precedes any use (A5). Approved 2026-10-19 with J as reference (B1–B4, R7):
+  timing pilot, missing features and label audit first, then a report; the
+  comparisons start only after it. Then feasibility checks and a system
+  specification for the researcher's approval.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
 - Do not push to GitHub until the researcher asks.

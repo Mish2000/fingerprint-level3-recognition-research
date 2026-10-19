@@ -288,3 +288,43 @@ group H covers the Stage B system.
   requested in parallel and used only if it arrives.
 - Stage B proceeds one step at a time; each step is reported to the researcher
   before the next starts.
+
+## 2026-10-19 — plain vs plain scenarios and a label audit
+
+Approved by the researcher on 2026-10-19: the timing pilot, the missing
+features and the label audit run now; the comparisons follow a report.
+
+- **B1/B2** New scenarios RxJ and QxJ, plain vs plain at native 1000 ppi:
+  probes R (slaps, Crossmatch L SCAN 1000PX) and Q (fingers segmented from
+  upper palms on the same scanner), reference J (fingers segmented from upper
+  palms, Morpho TouchPrint 5300). J has no thumbs, so positions 01 and 06 do
+  not occur. Each scenario is reported separately (R6).
+- **B3/C1** Full design inside each half: every probe against every J
+  reference of the same finger position, only for pairs whose two subjects are
+  both development or both test. Development: 626 genuine and 61,974 impostor
+  pairs; test: 649 and 64,251; 127,500 comparisons per algorithm.
+- **R7** Operational thresholds and fusion weights for these scenarios come
+  from development pairs: all of them for OpenCV SIFT and Pore SIFT; only the
+  validation subjects' pairs (152 genuine, 2,888 impostors) for the learned
+  pore descriptor and for every fusion that includes it, since it was trained
+  on the other development subjects. TAR at FAR is also read from the test
+  pairs' own scores (E2).
+- **A5** Label audit before any Q or J image is used, because NIST notes that
+  not every palm capture shows the labelled position (sd302c README). The
+  learned pore descriptor (second training) scores every usable Q and J image
+  against every usable V image of the same subject and against the V images of
+  the same finger position of every other subject. T is the threshold that at
+  most 0.01 % of these cross-subject comparisons score above. An image is
+  *confirmed* when its own V (same subject, labelled position) scores above T
+  and above every other candidate; *suspected* when another candidate scores
+  above T and above its own V; *undetermined* otherwise, and undetermined
+  images stay in. Suspected images are checked with OpenCV SIFT against the
+  full run's RxV development impostor threshold at FAR 0.01 % and shown side by
+  side. One is excluded only with the researcher's approval and a recorded
+  reason (R4); NIST labels are never changed (A2).
+- **B4** A timing pilot of the new design (100 development images of R, Q and
+  J; 2,000 probe × reference pairs; keyed hash) precedes the comparisons.
+  Features are extracted only where none exist: OpenCV SIFT for Q and J, Pore
+  SIFT for Q and J of test subjects. R features and the development Q and J
+  pore detections are reused from the full run and from `runs/method/pores`
+  (same worker, settings and model).

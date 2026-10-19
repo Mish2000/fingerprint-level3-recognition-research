@@ -3,7 +3,8 @@
 U, V and R reuse the full run's Pore SIFT features (runs/full/features/pore-sift). Q and J of
 development subjects, training data only (decision record 2026-10-08), are detected here with the
 same survey detector through the Pore SIFT driver; the files hold the same arrays (pore points
-and their SIFT descriptors).
+and their SIFT descriptors). Q and J of test subjects come from the plain vs plain run
+(runs/plain/features/pore-sift, decision record 2026-10-19) and are never used for training.
 
     python -m fpl3.method.pores [--workers 12]
 """
@@ -21,6 +22,7 @@ from ..experiments.common import REPO_ROOT, image_path, load_toml, read_images
 
 FULL_RUN_PORES = REPO_ROOT / "runs" / "full" / "features" / "pore-sift"
 METHOD_PORES = REPO_ROOT / "runs" / "method" / "pores"
+PLAIN_RUN_PORES = REPO_ROOT / "runs" / "plain" / "features" / "pore-sift"
 
 
 def development_images(sets: str = "UVRQJ") -> list[dict]:
@@ -32,7 +34,10 @@ def development_images(sets: str = "UVRQJ") -> list[dict]:
 
 def pore_file(image_id: str) -> Path:
     """Where an image's pore points and SIFT descriptors are stored."""
-    return (METHOD_PORES if image_id[0] in "QJ" else FULL_RUN_PORES) / f"{image_id}.npz"
+    if image_id[0] in "QJ":
+        method = METHOD_PORES / f"{image_id}.npz"
+        return method if method.exists() else PLAIN_RUN_PORES / f"{image_id}.npz"
+    return FULL_RUN_PORES / f"{image_id}.npz"
 
 
 def main(argv: list[str] | None = None) -> None:

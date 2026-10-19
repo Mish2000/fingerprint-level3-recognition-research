@@ -56,11 +56,12 @@ CHUNK_SIZE = {
 # Worker seconds per item while 12 workers run, measured on 2026-10-07 per image set and per probe
 # set: Pore SIFT from the timing-pilot logs, OpenCV SIFT from a 3-minute re-measurement. They weigh
 # progress and forecast stages that have not started; finished chunks correct them as the run goes.
+# Q and J (plain vs plain run) start from R's values: plain images of similar size.
 WORKER_SECONDS = {
-    ("opencv-sift", "extract"): {"U": 1.31, "V": 1.31, "R": 0.26},
-    ("opencv-sift", "compare"): {"U": 0.687, "R": 0.478},
-    ("pore-sift", "extract"): {"U": 15.6, "V": 16.9, "R": 3.2},
-    ("pore-sift", "compare"): {"U": 0.381, "R": 0.180},
+    ("opencv-sift", "extract"): {"U": 1.31, "V": 1.31, "R": 0.26, "Q": 0.26, "J": 0.26},
+    ("opencv-sift", "compare"): {"U": 0.687, "R": 0.478, "Q": 0.478},
+    ("pore-sift", "extract"): {"U": 15.6, "V": 16.9, "R": 3.2, "Q": 3.2, "J": 3.2},
+    ("pore-sift", "compare"): {"U": 0.381, "R": 0.180, "Q": 0.180},
 }
 FEATURE_MB = {"opencv-sift": 9.9, "pore-sift": 1.9}  # largest mean feature file per image in the timing pilots
 SET_ORDER = {"V": 0, "U": 1, "R": 2}  # dearest first, so cheap items fill the end of a stage
@@ -107,9 +108,9 @@ class Stage:
     def label(self, hebrew: bool = True) -> str:
         part = self.design or self.kind
         if hebrew:
-            what = {"extract": "חילוץ מאפיינים", "compact": "השוואות המדגם המצומצם", "rest": "שאר ההשוואות"}[part]
+            what = {"extract": "חילוץ מאפיינים", "compact": "השוואות המדגם המצומצם", "rest": "שאר ההשוואות", "all": "השוואות"}[part]
             return f"{NAMES[self.algorithm]} · {what}"
-        what = {"extract": "features", "compact": "compact pairs", "rest": "other pairs"}[part]
+        what = {"extract": "features", "compact": "compact pairs", "rest": "other pairs", "all": "pairs"}[part]
         return f"{NAMES[self.algorithm]} {what}"
 
 
@@ -254,12 +255,21 @@ def atomic_write(path: Path, text: str) -> None:
     os.replace(temporary, path)
 
 
+PAGE = {
+    "module": "fpl3.experiments.full_run",
+    "title": "ההרצה המלאה",
+    "empty_results": "התוצאות של המדגם המצומצם יופיעו כאן בסוף שלב ההשוואות שלו.",
+}
+
+
 class Progress:
     """What is done and what is left; the forecast scales the expected worker seconds of the work
-    left by how much longer the finished chunks took than expected."""
+    left by how much longer the finished chunks took than expected. `page` overrides PAGE for
+    another run built from the same stages (its module, title and empty-results text)."""
 
-    def __init__(self, run_dir: Path, stages: list[Stage], workers: int, started: float):
+    def __init__(self, run_dir: Path, stages: list[Stage], workers: int, started: float, page: dict | None = None):
         self.run_dir, self.stages, self.workers, self.started = run_dir, stages, workers, started
+        self.page = {**PAGE, **(page or {})}
         self.done = {s.name: finished_chunks(run_dir, s) for s in stages}
         self.expected = {s.name: s.expected_seconds(s.items) for s in stages}
         self.state, self.error, self.current = "running", "", None
@@ -330,7 +340,9 @@ class Progress:
             "stages": stages,
             "results": self.results,
             "warnings": self.warnings,
-            "commands": {flag: f'"{sys.executable}" -m fpl3.experiments.full_run{flag}' for flag in ("", " --status", " --stop")},
+            "title": self.page["title"],
+            "empty_results": self.page["empty_results"],
+            "commands": {flag: f'"{sys.executable}" -m {self.page["module"]}{flag}' for flag in ("", " --status", " --stop")},
         }
 
     def write(self, force: bool = False) -> None:
@@ -437,7 +449,7 @@ def isolate_names(markup: str) -> str:
     return markup
 
 
-def results_html(results: dict) -> str:
+def results_html(results: dict, empty: str = PAGE["empty_results"]) -> str:
     blocks = []
     for algorithm, name in NAMES.items():
         entry = results.get(algorithm, {})
@@ -464,7 +476,7 @@ def results_html(results: dict) -> str:
                 f"<tbody>{''.join(rows)}</tbody></table></div>{note}"
             )
     if not blocks:
-        return '<p class="muted">התוצאות של המדגם המצומצם יופיעו כאן בסוף שלב ההשוואות שלו.</p>'
+        return f'<p class="muted">{html.escape(empty)}</p>'
     return "".join(blocks) + (
         '<p class="muted">בכל שורה, זוג מתקבל כשהציון שלו גבוה מהסף הנמוך ביותר שבו שיעור המתחזים שמתקבלים '
         "לא עולה על ה-FAR שבשורה. השוואה שנכשלה לא מתקבלת לעולם.</p>"
@@ -509,6 +521,7 @@ def render_page(snap: dict) -> str:
         )
     pairs = sum(s["items"] for s in stages if s["name"].startswith("opencv-sift/compare"))
     commands = snap["commands"]
+    title = e(snap.get("title", PAGE["title"]))
     updated = datetime.fromtimestamp(now)
     return f"""<!doctype html>
 <html lang="he" dir="rtl" data-updated="{now:.0f}" data-state="{e(state)}">
@@ -516,12 +529,12 @@ def render_page(snap: dict) -> str:
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="refresh" content="30">
-<title>ההרצה המלאה</title>
+<title>{title}</title>
 <style>{PAGE_CSS}</style>
 </head>
 <body>
 <main>
-<h1>ההרצה המלאה</h1>
+<h1>{title}</h1>
 <p class="muted"><bdi>OpenCV SIFT</bdi> ו-<bdi>Pore SIFT</bdi> · {pairs:,} זוגות לכל אלגוריתם · {snap["workers"]} תהליכים במקביל</p>
 <div id="stale" class="banner" hidden>הדף לא התעדכן כבר יותר מ-{STALE_AFTER_S // 60} דקות. ייתכן שההרצה נעצרה, למשל כי המחשב כבה או נכנס למצב שינה. אפשר להמשיך מאותה נקודה עם פקודת ההרצה שבתחתית הדף.</div>
 {"".join(f'<div class="banner">{isolate_names(e(w))}</div>' for w in snap["warnings"])}
@@ -530,7 +543,7 @@ def render_page(snap: dict) -> str:
 <thead><tr><th>שלב</th><th>התקדמות</th><th>מצב</th><th>זמן</th></tr></thead>
 <tbody>{"".join(rows)}</tbody></table></div>
 <p class="muted">הצפי מחושב מהקצב שנמדד עד עכשיו ומתעדכן לאורך ההרצה.</p></section>
-<section class="card"><h2>תוצאות</h2>{results_html(snap["results"])}</section>
+<section class="card"><h2>תוצאות</h2>{results_html(snap["results"], snap.get("empty_results", PAGE["empty_results"]))}</section>
 <section class="card commands"><h2>פקודות</h2>
 <p>הרצה, או המשך מאותה נקודה אחרי הפסקה: <code>{e(commands[""])}</code></p>
 <p>מצב ההרצה בטרמינל: <code>{e(commands[" --status"])}</code></p>

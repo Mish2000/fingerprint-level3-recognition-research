@@ -1,4 +1,5 @@
-"""Deterministic samples drawn from C1's development half: the F1 gate and the timing pilots.
+"""Deterministic samples drawn from C1's development half: the F1 gate and the timing pilots
+(the full design's and the plain vs plain design's).
 
 C1 is not activated for anything else (decision record, 2026-10-06): these
 helpers only read which subjects the fixed split would place in development.
@@ -78,4 +79,29 @@ def pilot_sample(
     for probe, reference in chosen:
         same = probe["subject"] == reference["subject"] and int(probe["frgp"]) == int(reference["frgp"])
         pairs.append(pair_record("pilot", "genuine" if same else "impostor", probe, reference))
+    return pilot_images, sorted(pairs, key=lambda p: (p["probe_image_id"], p["reference_image_id"]))
+
+
+def pilot_sample_plain(
+    images: list[dict], master_seed: str, dev_fraction: float, n_images: int = 100, n_pairs: int = 2000
+) -> tuple[list[dict], list[dict]]:
+    """Timing-pilot sample of the plain vs plain design (decision record 2026-10-19): `n_images`
+    development images of R, Q and J without thumbs (J has none), and up to `n_pairs` probe (R or Q)
+    x reference (J) pairs among them, both by keyed hash."""
+    development, _ = development_subjects(images, master_seed, dev_fraction)
+    pool = [
+        row
+        for row in images
+        if row["set"] in ("R", "Q", "J") and not int(row["excluded"]) and row["subject"] in development
+        and int(row["frgp"]) not in (1, 6)
+    ]
+    pilot_images = keyed_rank(pool, master_seed, "pilot-plain-images", key=lambda row: row["image_id"])[:n_images]
+    probes = [row for row in pilot_images if row["set"] in ("R", "Q")]
+    references = [row for row in pilot_images if row["set"] == "J"]
+    candidates = [(p, r) for p in probes for r in references]
+    chosen = keyed_rank(candidates, master_seed, "pilot-plain-pairs", key=lambda c: f"{c[0]['image_id']}|{c[1]['image_id']}")[:n_pairs]
+    pairs = []
+    for probe, reference in chosen:
+        same = probe["subject"] == reference["subject"] and int(probe["frgp"]) == int(reference["frgp"])
+        pairs.append(pair_record("pilot-plain", "genuine" if same else "impostor", probe, reference))
     return pilot_images, sorted(pairs, key=lambda p: (p["probe_image_id"], p["reference_image_id"]))
