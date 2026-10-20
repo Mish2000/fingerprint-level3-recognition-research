@@ -14,15 +14,15 @@ supervision. Every reply to the researcher is in Hebrew (he asked repeatedly);
 code, docs and commits stay in English.
 
 Stage B (supervisor meeting 2026-10-18, H1–H6 and G4; it replaces the
-2026-10-10 task list): only a system build, in its own public repository
-`C:\multimodal-biometric-system`, embedding this repository's fingerprint
-methods. Login (email or username + password) → menu with fingerprint
-(primary), face and voice → enrolment, 1:1 verification and 1:N
-identification, both built as an impressive, interactive experience, with the
-algorithm chosen from short accuracy, speed and how-it-works descriptions
-written for a simple but curious user. Face and voice use ready-made SDKs. The
-national ID is never stored. Raw samples and every attempt are stored
-encrypted; decisions compare stored templates, each in its method's native form.
+2026-10-10 task list) is only a system build: fingerprint (primary), face and
+voice, each with enrolment, 1:1 verification and 1:N identification,
+embedding this repository's fingerprint methods. It lives in its own public
+repository,
+[multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system)
+(locally `C:\multimodal-biometric-system`), whose `docs/decisions.md` (H7 on),
+`docs/specification.md` and AGENTS.md hold the system's decisions, its
+specification and the current state of Stage B; this file does not repeat
+them.
 
 ## Working rules
 
@@ -193,15 +193,17 @@ pytest                           # + integration tests against local SD302
   88.9 % plain; fused with both existing algorithms 99.2 % and 93.9 %. The
   proposed part 2 (whole print at 500 ppi) was withdrawn on 2026-10-10 (D1).
 - Stage B decisions (2026-10-18/19): H1–H6 and G4 in `docs/decisions.md`; the
-  2026-10-10 work order (new methods 2–6) is withdrawn. The system repository
-  `C:\multimodal-biometric-system` exists since 2026-10-19 (local only); it
-  carries H1–H6 and G4 over, and system decisions from H7 on are recorded
-  there. Scanner: Biometrika HiScan PRO, 1000 ppi only when selected (default
-  500); integration through TWAIN with the resolution set in code (H5).
-  The vendor's FxISO SDK exists locally only as x64 DLLs without headers or
-  documentation; the request for FxISO SDK Light to DigitalPlatforms
-  (Biometrika's owner), drafted on 2026-10-18, has been sent by the researcher
-  (reported on 2026-10-19); no reply yet.
+  2026-10-10 work order (new methods 2–6) is withdrawn. Everything after them
+  (the scanner, the system's decisions from H7 on, its specification and its
+  build) is in the system repository and its AGENTS.md.
+- The system imports this repository's methods through a pinned link (its H10
+  and H21): its `methods/research-pin.toml` names commit 606c8d3, and the
+  system refuses to run when a tracked file here other than `AGENTS.md`,
+  `README.md` and `docs/` differs from that commit, or when a pinned artefact
+  outside git (`runs/method/repeat/model.pt`, `runs/plain/eval/report.json`)
+  changes. A change to code, configurations, environments, manifests or tests
+  is a new research version: it needs a new pin and a decision in the system
+  repository.
 - Plain vs plain, done 2026-10-19 (B1–B4, R7, A5; runs/plain, runs/plain/eval):
   SD302 has it only across devices (R and Q on the Crossmatch L SCAN against J
   on the Morpho TouchPrint, no thumbs). Label audit (T = 17): Q 817 confirmed,
@@ -212,29 +214,6 @@ pytest                           # + integration tests against local SD302
   kept the test FAR below 0.1 % for every method; at 0.01 % the validation
   subjects' 1,584 impostors are too few for fusions (QxJ: 18 false accepts).
   Times: OpenCV SIFT 42 min, Pore SIFT 8 min, learned descriptor 48 s.
-- Scanner prototype, approved 2026-10-19 with the NTwain download (H7 in the
-  system repository): the skeleton and the capture tool (C#, .NET Framework
-  4.8, x86, NTwain 3.7.6) are built and tested without scanning; its checks
-  reproduce the 2026-10-18 analysis of the researcher's ten first captures
-  exactly. A probe of the plugged-in scanner showed that its TWAIN driver
-  ("TWAIN Biometrika Driver" 2.2) offers only 500 ppi and refuses 1000, with no
-  saved settings (CAP_CUSTOMDSDATA); its own window offers "Save 1000 DPI...".
-  So the approved route and its fallback are blocked; the route to 1000 ppi
-  awaits the researcher.
-- Then, one step at a time: the researcher captures a second set of his
-  ten fingers at 1000 ppi (his first set, one capture per finger, stays
-  outside the repository); our methods on those HiScan PRO captures (pores,
-  time per attempt, same finger against different fingers at the plain vs
-  plain thresholds); face and voice feasibility (OpenCV SFace with YuNet,
-  SpeechBrain ECAPA-TDNN; downloads need approval); then the system
-  specification for approval. Volunteers only if the supervisor wants accuracy
-  on the HiScan PRO itself (about 10 people for FAR 1 %, 20 for 0.1 %).
-- Awaiting the researcher: the route to 1000 ppi (the vendor's reply to the
-  request already sent; a capture through the driver's own window, tried at
-  the scanner; the undocumented OEM library is not recommended); the proposed
-  system default (the learned descriptor alone at FAR 0.1 %, fusions offered
-  as options).
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
-- Do not push to GitHub until the researcher asks; the commits made since
-  2026-10-18 are local only.
+- Push to GitHub only when the researcher asks.
