@@ -216,4 +216,5 @@ pytest                           # + integration tests against local SD302
   Times: OpenCV SIFT 42 min, Pore SIFT 8 min, learned descriptor 48 s.
 - Report results to the researcher as plain TAR / FAR / FRR with pair counts;
   avoid AUC and statistical jargon unless asked.
-- Push to GitHub only when the researcher asks.
+- Push each commit to GitHub as soon as it is made (the researcher,
+  2026-10-24), after checking it for assistant traces and local paths.
