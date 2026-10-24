@@ -48,6 +48,7 @@ rejects are 14/1,000 and 39/460; false accepts are 99/99,000 and 45/45,540.
 | Repository | Focus |
 |---|---|
 | [fingerprint-level3-recognition-research](../README.md) | **Current research:** SD302, learned pore descriptors and score fusion |
+| [multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system) | **Stage B, in progress:** a desktop system for enrollment, 1:1 verification and 1:N identification by fingerprint, face and voice |
 | [fingerprint-research](https://github.com/Mish2000/fingerprint-research) | **Application:** verification, gallery search, UI, storage and scanner integration |
 | [fingerprint-benchmark](https://github.com/Mish2000/fingerprint-benchmark) | **Completed benchmark:** six verification routes on SD300 at a shared 500 ppi processing resolution |
 | [fingerprint-new-method](https://github.com/Mish2000/fingerprint-new-method) | **ML/CV case study:** U-Net pore localization on synthetic labels; real-data transfer remained inconclusive |
