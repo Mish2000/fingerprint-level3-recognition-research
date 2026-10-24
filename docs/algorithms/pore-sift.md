@@ -1,4 +1,4 @@
-# Pore SIFT — SIFT descriptors at detected pores (eligibility note)
+# Pore SIFT: SIFT descriptors at detected pores (eligibility note)
 
 Status: **approved 2026-10-06** (D2): score mode `basic`, the F1 protocol and its
 pass criterion, and the separate environment below. The composition of
@@ -16,7 +16,7 @@ Segundo co-authored both publications and the spatial score's source paper
 (Pamplona Segundo & Lemes 2015). The authors declined to share their own trained
 detector (2026-09-30), which is why the survey detector stands in.
 
-## D1 — resolution
+## D1: resolution
 
 - **Screening:** both components were built and evaluated on high-resolution
   fingerprints: PolyU-HRF at about 1200 ppi, and L3-SF, which mimics it.
@@ -32,7 +32,7 @@ detector (2026-09-30), which is why the survey detector stands in.
   in SD302 are about 17 % smaller in pixels. D2 forbids rescaling, so this is
   tested by F1 rather than corrected.
 
-## D2 / D2b — exactly what the wrapper does
+## D2 / D2b: exactly what the wrapper does
 
 1. **Weights check.** Verify the SHA-256 of `models/40`, and confirm it loads with
    `torch.load(..., weights_only=True)` as a plain state dict, before upstream's
@@ -66,7 +66,7 @@ detector (2026-09-30), which is why the survey detector stands in.
    for a current Python. The wrapper registers an empty `tensorflow` module before
    importing `utils.py`. No upstream line is changed.
 
-### Score mode — `basic` (approved 2026-10-06)
+### Score mode: `basic` (approved 2026-10-06)
 
 - **`basic` (code default, used).** The number of bidirectional correspondences
   that pass the ratio check. Every documented command, including the paper's
@@ -75,7 +75,7 @@ detector (2026-09-30), which is why the survey detector stands in.
   which sums 1/(1+|d1−d2|) over pairs of correspondences. fingerprint-benchmark
   V2 used it; D2b keeps the default instead.
 
-## D3 — training data
+## D3: training data
 
 The training data of the survey's out-of-the-box checkpoint is not documented.
 Pore annotations exist publicly for PolyU-HRF and L3-SF, so SD302 exposure is
@@ -92,13 +92,13 @@ A separate conda environment:
 | torch / torchvision | 1.13.0 / 0.14.0 CPU | The survey's own pins |
 | numpy | 1.26.4 | |
 | opencv-contrib-python | 3.4.18.65 | Closest available to Dahia's pin 3.4.0.12; provides `xfeatures2d.SIFT` and `KeyPoint.convert(size=)` |
-| psutil, tqdm | — | Imported by the survey's utilities |
+| psutil, tqdm | not pinned | Imported by the survey's utilities |
 
 The deviations from the original pins (Python version, OpenCV 3.4.18 instead of
 3.4.0.12) are recorded with every run. torch 1.13 has no support for the RTX 5080,
 so Pore SIFT runs on CPU only, parallelised across processes.
 
-## F1 — pore-feasibility gate (first run of Pore SIFT)
+## F1: pore-feasibility gate (first run of Pore SIFT)
 
 - **Sample.** Ten subjects from C1's development half who have R images, chosen
   by keyed hash (`f1-subjects`), and two finger positions chosen by keyed hash

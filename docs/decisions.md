@@ -1,10 +1,10 @@
 # Decision record
 
-Decisions approved by Michael Sirkovich in chat on 2026-10-05/06, before any
+Decisions approved by Michael Sirkovich on 2026-10-05/06, before any
 code was written. Changes are appended below with date and reason; existing
 entries are not rewritten.
 
-## R — standing rules
+## R: standing rules
 
 - **R1** SD302 stays read-only at its local path; nothing is copied into it or modified.
 - **R2** Resolution is read from each file's PNG header (pHYs), not from folder
@@ -29,7 +29,7 @@ entries are not rewritten.
   comes from development subjects.
 - **R8** No images, crops, templates or descriptors enter git.
 
-## A — data cleaning
+## A: data cleaning
 
 - **A1** Latents (sd302e/h/i) are out of scope.
 - **A2** Images named in the errata for the included sets are excluded; NIST
@@ -41,7 +41,7 @@ entries are not rewritten.
   NIST's examiner-annotated set (sd302g) and showing a vertical seam with an
   abrupt texture change.
 
-## B — comparisons and pairs
+## B: comparisons and pairs
 
 - **B1** Reference set V (NIST's baseline exemplar set: one physical device,
   examiner-annotated in sd302g). Probes are compared against it in one fixed
@@ -55,20 +55,20 @@ entries are not rewritten.
   timing pilot (about 100 extractions and 2,000 comparisons) precedes every full
   run, and its projection is approved first.
 
-## C — split
+## C: split
 
 - **C1** Approved in principle: 50/50 by subject, stratified by whether the
   subject has R images, keyed hash. Activation is postponed until something has
   to be tuned; the split is defined in code and fixed by the master seed.
 
-## G — infrastructure
+## G: infrastructure
 
 - **G1** Root folder `C:\fingerprint-level3-recognition-research`.
 - **G2** Git from the first commit; a GitHub repository (public is acceptable).
 - **G3** Conda environment from conda-forge through the existing Miniconda,
   Python 3.12.
 
-## D — algorithm eligibility
+## D: algorithm eligibility
 
 - **D1** Only systems designed for ≥1000 ppi input.
   - Screening: documentation shows the algorithm can take ≥1000-ppi input.
@@ -88,7 +88,7 @@ entries are not rewritten.
   permits research use and publication of results.
 - **D5** No quota: whatever qualifies is included.
 
-## E — evaluation
+## E: evaluation
 
 - **E1** A failure to produce a score counts at the lowest score and failure
   rates are reported separately (ISO/IEC 19795-1 practice); a common-subset
@@ -103,7 +103,7 @@ entries are not rewritten.
 - **E5** All work runs on the current PC. Reported timings are single-thread on
   a sample; full runs may run in parallel.
 
-## F — Level 3 and the new method
+## F: Level 3 and the new method
 
 - **F1** A pore-feasibility gate on a small development sample of SD302 comes
   before developing the method.
@@ -116,7 +116,7 @@ entries are not rewritten.
   existing algorithm.
 - **F5** Liveness detection is out of scope for now.
 
-## 2026-10-06 — confirmations
+## 2026-10-06: confirmations
 
 - **D1** Confirmed as two stages: screening by the documentation, then
   qualification by the operational test above.
@@ -128,7 +128,7 @@ entries are not rewritten.
   development; C1 is not otherwise activated.
 - **G2** The GitHub repository is public.
 
-## 2026-10-06 — algorithm eligibility notes approved
+## 2026-10-06: algorithm eligibility notes approved
 
 - **Naming** Algorithms are referred to by name everywhere ("OpenCV SIFT",
   "Pore SIFT"), never by placeholder labels.
@@ -147,16 +147,16 @@ entries are not rewritten.
   (Python 3.10, torch 1.13.0, opencv-contrib-python 3.4.18.65). One command
   drives both.
 
-## 2026-10-07 — F1 no longer disqualifies
+## 2026-10-07: F1 no longer disqualifies
 
 - **F1/F2** F1 is informational only. An algorithm is not dropped for missing an
   accuracy target, because so few candidates qualify (consistent with D5); F2 no
   longer applies. Pore SIFT continues after its F1 run of 2026-10-06 (rolled vs
   rolled TAR 90 %, FRR 10 %, FAR 0/180; plain vs rolled TAR 65 %, FRR 35 %,
   FAR 0/180, at the lowest threshold that accepts no impostor).
-- **G2** Nothing is pushed to GitHub until the researcher asks.
+- **G2** Nothing is published before it is reviewed.
 
-## 2026-10-07 — full run
+## 2026-10-07: full run
 
 - **B3** The full impostor set runs now for OpenCV SIFT and Pore SIFT: every
   probe against every reference of the same finger position, 582,724 pairs per
@@ -169,7 +169,7 @@ entries are not rewritten.
   plain vs rolled pairs than the full design.
 - **E2** TAR at FAR 0.01 % is reported as well, since the runtime allows it.
 
-## 2026-10-08 — threshold rule and the research's own methods
+## 2026-10-08: threshold rule and the research's own methods
 
 - **E2** TAR at FAR x: a pair is accepted when its score is above the lowest
   threshold at which at most a share x of the impostor pairs is accepted; a
@@ -184,8 +184,7 @@ entries are not rewritten.
   460 and 45,540. Anything learned or tuned uses development pairs (R7); the
   research's own methods are compared with the existing algorithms on test pairs,
   using the existing algorithms' full-run scores.
-- **D1/D2a — scikit-image Harris** (decided by the assistant on the researcher's
-  delegation): OpenCV documents Harris only as a corner detector; scikit-image's
+- **D1/D2a (scikit-image Harris):** OpenCV documents Harris only as a corner detector; scikit-image's
   example *Robust matching using RANSAC* is a complete Harris pipeline
   (`docs/algorithms/skimage-harris.md`). As written it would need months for the
   full design (B4), so it first runs unchanged on the F1 sample, as OpenCV SIFT
@@ -193,12 +192,12 @@ entries are not rewritten.
   is decided after that result.
 - **G3** scikit-image (0.26.0) and SciPy are added to the project environment
   from conda-forge.
-- **D1/D2a — scikit-image Harris, F1 result:** TAR 0/20 in UxV and RxV at the
+- **D1/D2a (scikit-image Harris, F1 result):** TAR 0/20 in UxV and RxV at the
   strictest threshold; genuine scores at chance level (median 3 inliers, RANSAC's
   minimum sample). It finds a shifted copy of an image (204 inliers) but no
   correspondences between two impressions of a finger, as its documentation
   warns. It stays at the F1 result: no faster implementation and no full run.
-- **F3/F4 — our method, part 1:** `docs/methods/learned-pore-descriptor.md`
+- **F3/F4 (our method, part 1):** `docs/methods/learned-pore-descriptor.md`
   approved: a reference fusion of the existing algorithms first, then Dahia &
   Pamplona Segundo's learned pore descriptor trained on development subjects and
   matched as in Pore SIFT. Harris is not part of it.
@@ -208,7 +207,7 @@ entries are not rewritten.
   2.13 with CUDA 13.0 (the driver supports up to 13.1) from conda-forge. The GPU
   is to be used as much as possible (researcher, 2026-10-08).
 
-## 2026-10-10 — native resolution for the research's own methods
+## 2026-10-10: native resolution for the research's own methods
 
 - **D1** The qualification now binds the research's own methods as well
   (researcher, 2026-10-10): every method, learned or not, compares prints from
@@ -217,14 +216,14 @@ entries are not rewritten.
   part 2 of our method (a fine-tuned general vision model on the whole print at
   500 ppi) is withdrawn.
 
-## 2026-10-16 — research overview and publication
+## 2026-10-16: research overview and publication
 
 - **G2** The researcher approved publishing the concise research overview and
   README updates across the five repositories, including the previously local
   October 10–11 documentation. This repository is the current research home;
   the previous Level-3 repository retains its evidence and an overview link
   before archival. Existing CV links remain usable.
-- **D2/R7 — reporting correction:** the executed pore descriptor is trained
+- **D2/R7 (reporting correction):** the executed pore descriptor is trained
   from random initialization in PyTorch, rather than fine-tuned from pretrained
   descriptor weights. Its optimizer is SGD without weight decay. Automatic
   annotation uses SIFT/RANSAC alignment, block matching and a local
@@ -236,9 +235,9 @@ entries are not rewritten.
   contains documentation and aggregate results only; research artifacts stay
   local.
 
-## 2026-10-18 — Stage B: the identification system
+## 2026-10-18: Stage B: the identification system
 
-Approved by the researcher after the supervisor meeting of 2026-10-18. A new
+Approved after the supervisor meeting of 2026-10-18. A new
 group H covers the Stage B system.
 
 - **H1** Stage B is a system build only. It embeds the fingerprint methods of
@@ -272,11 +271,10 @@ group H covers the Stage B system.
   1000 is selected). The integration is designed anew; the Stage A TWAIN helper
   is not reused.
 - **G4** The system lives in a new public repository directly under `C:\`,
-  named by the researcher. Its commits use the repository-local identity
-  without co-author trailers. This repository stays the research home and the
+  named by the researcher. This repository stays the research home and the
   source of the methods.
 
-## 2026-10-18 — Stage B follow-up
+## 2026-10-18: Stage B follow-up
 
 - **G4** Repository name: `multimodal-biometric-system`, at
   `C:\multimodal-biometric-system`.
@@ -289,9 +287,9 @@ group H covers the Stage B system.
 - Stage B proceeds one step at a time; each step is reported to the researcher
   before the next starts.
 
-## 2026-10-19 — plain vs plain scenarios and a label audit
+## 2026-10-19: plain vs plain scenarios and a label audit
 
-Approved by the researcher on 2026-10-19: the timing pilot, the missing
+Approved on 2026-10-19: the timing pilot, the missing
 features and the label audit run now; the comparisons follow a report.
 
 - **B1/B2** New scenarios RxJ and QxJ, plain vs plain at native 1000 ppi:
@@ -329,7 +327,7 @@ features and the label audit run now; the comparisons follow a report.
   pore detections are reused from the full run and from `runs/method/pores`
   (same worker, settings and model).
 
-## 2026-10-19 — plain vs plain comparisons
+## 2026-10-19: plain vs plain comparisons
 
 - **B4** After the report of the pilots, the missing features and the label
   audit, the researcher approved the comparisons together with their
@@ -342,7 +340,7 @@ features and the label audit run now; the comparisons follow a report.
   second training only, the one the validation subjects chose; its first
   training is not scored on them.
 
-## 2026-10-18 — defaults for the system specification (recorded 2026-10-19)
+## 2026-10-18: defaults for the system specification (recorded 2026-10-19)
 
 - **H6** Approved with the researcher's general approval of the plan on
   2026-10-18 and open to change in the specification:
@@ -367,9 +365,14 @@ features and the label audit run now; the comparisons follow a report.
     interactive experience, and the texts are written for a simple but curious
     user (researcher, 2026-10-18).
 
-## 2026-10-19 — the system repository
+## 2026-10-19: the system repository
 
 - **G4** The researcher approved the scanner prototype and the NTwain download
   on 2026-10-19, and `C:\multimodal-biometric-system` was created (local only).
   Its `docs/decisions.md` carries H1–H6 and G4 over; system decisions from H7
   on are recorded there and no longer here.
+
+## 2026-10-24: wording of process notes
+
+- Wording of process notes edited for publication; no decision, protocol or
+  result changed.

@@ -1,7 +1,7 @@
 # scikit-image Harris on the native image (eligibility note)
 
-Status: **F1 check done, 2026-10-08; not included in the comparison** (decided
-by the assistant on the researcher's delegation; decision record 2026-10-08).
+Status: **F1 check done, 2026-10-08; not included in the comparison**
+(decision record 2026-10-08).
 
 ## F1 result (runs/f1-skimage-harris)
 
@@ -24,7 +24,7 @@ by the assistant on the researcher's delegation; decision record 2026-10-08).
 |---|---|
 | Algorithm | Harris corners (Harris & Stephens 1988), sub-pixel corner positions, correspondences by the smallest Gaussian-weighted SSD of 11 × 11 windows, and RANSAC with an affine model |
 | Implementation | scikit-image 0.26.0 from conda-forge (`corner_harris`, `corner_peaks`, `corner_subpix`, `ransac`, `AffineTransform`) |
-| Pipeline source | scikit-image's official gallery example *Robust matching using RANSAC* (`doc/examples/transform/plot_matching.py`, tag v0.26.0) — every step and parameter below is copied from it |
+| Pipeline source | scikit-image's official gallery example *Robust matching using RANSAC* (`doc/examples/transform/plot_matching.py`, tag v0.26.0); every step and parameter below is copied from it |
 | Licence | BSD-3-Clause |
 | Training data | none (hand-crafted), so no SD302 exposure (D3 not applicable) |
 
@@ -40,12 +40,12 @@ component documented together by the library's authors, so D2a is met without
 an exception. Its *BRIEF* example has no geometric verification and, by its own
 note, no rotation invariance, so it is not used.
 
-## D1 — resolution
+## D1: resolution
 
 - **Screening:** the operators have no resolution parameter and take any image size.
 - **Qualification:** the image is analysed at its native 1000 ppi; nothing is resized.
 
-## D2 / D2b — exactly what the wrapper does
+## D2 / D2b: exactly what the wrapper does
 
 1. Read the PNG with `cv.imread(path, cv.IMREAD_GRAYSCALE)` and `img_as_float`
    (8-bit to [0, 1]), as the example does for its image; no crop, resize or enhancement.

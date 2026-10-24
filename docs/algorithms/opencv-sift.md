@@ -8,11 +8,11 @@ Status: **approved 2026-10-06** (D2), including the score definition below.
 |---|---|
 | Algorithm | SIFT keypoints and descriptors (Lowe 2004) with ratio-test matching and RANSAC geometric verification |
 | Implementation | OpenCV 4.x, main module (`cv.SIFT_create`, `cv.FlannBasedMatcher`, `cv.findHomography`) |
-| Pipeline source | OpenCV's official tutorial *Feature Matching + Homography to find Objects* (`doc/py_tutorials/py_feature2d/py_feature_homography/py_feature_homography.markdown`, opencv/opencv branch 4.x) — every step and parameter below is copied from it |
+| Pipeline source | OpenCV's official tutorial *Feature Matching + Homography to find Objects* (`doc/py_tutorials/py_feature2d/py_feature_homography/py_feature_homography.markdown`, opencv/opencv branch 4.x); every step and parameter below is copied from it |
 | Licence | Apache 2.0 (OpenCV ≥ 4.5); the SIFT patent expired in 2020 |
 | Training data | none (hand-crafted), so no SD302 exposure (D3 not applicable) |
 
-## D1 — resolution
+## D1: resolution
 
 - **Screening:** SIFT has no resolution parameter; it is scale-invariant by
   design, and OpenCV documents that "the number of octaves is computed
@@ -23,7 +23,7 @@ Status: **approved 2026-10-06** (D2), including the score definition below.
   1000 ppi is therefore analysed; the coarser octaves are part of SIFT's scale
   space, which D1 accepts. Nothing normalises the input below 1000 ppi.
 
-## D2 / D2b — exactly what the wrapper does
+## D2 / D2b: exactly what the wrapper does
 
 1. Read the PNG with `cv.imread(path, cv.IMREAD_GRAYSCALE)`. The SD302 files are
    already 8-bit grayscale, so the pixels are passed unchanged; no crop, resize,
