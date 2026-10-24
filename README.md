@@ -25,6 +25,11 @@ Test pairs: **1,000 genuine / 99,000 impostor** rolled comparisons and
 45/45,540 false accepts. A second training seed reaches **99.2% / 93.9% TAR**
 with the same fusion. [All methods, counts and intervals](docs/methods/learned-pore-descriptor.md).
 
+Plain vs plain across two scanners (2026-10-19), TAR at FAR ≤ 0.1%: the learned
+descriptor (second training) reaches **95.1% / 93.4%** (RxJ / QxJ), against
+70.8% / 68.1% for OpenCV SIFT and 77.9% / 78.5% for Pore SIFT, on 226 / 423
+genuine and 29,628 / 34,623 impostor test pairs.
+
 ## What is implemented
 
 - **Data and evaluation:** verified image metadata and exclusions, deterministic
@@ -76,8 +81,9 @@ remain local; public source and aggregate results can be inspected independently
 
 ## Research context
 
-This is the current research repository. The [five-project overview](docs/research-projects.md)
-connects it to the completed 500 ppi benchmark, synthetic localization study,
-historical SD300B Level-3 study and separate application workbench. The present
-results concern 1:1 verification; 1:N evaluation and integration into the
-workbench are planned.
+This is the current research repository (Stage A). The [six-repository overview](docs/research-projects.md)
+places it after the earlier application workbench, the completed 500 ppi
+benchmark, the synthetic localization study and the historical SD300B Level-3
+study, all now archived. The present results concern 1:1 verification; Stage B,
+[multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system),
+is building them into a system with 1:N identification.

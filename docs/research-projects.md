@@ -38,23 +38,24 @@ rejects are 14/1,000 and 39/460; false accepts are 99/99,000 and 45/45,540.
   OpenCV SIFT, Pore SIFT and the learned descriptor were each scored on
   **582,724 pairs** across the full cohort; the result above uses its test subset.
   [Evaluation code](../src/fpl3/experiments/evaluate.py)
-- **Software integration:** a separate React/TypeScript and FastAPI workbench
-  with PostgreSQL/pgvector retrieval, pairwise reranking, a Java SourceAFIS
-  service and Windows scanner capture.
-  [Engineering case study](https://github.com/Mish2000/fingerprint-research/blob/main/docs/ENGINEERING_CASE_STUDY.md)
+- **Software integration:** an earlier React/TypeScript and FastAPI workbench,
+  now archived, with PostgreSQL/pgvector retrieval, pairwise reranking, a Java
+  SourceAFIS service and Windows scanner capture
+  ([engineering case study](https://github.com/Mish2000/fingerprint-research/blob/main/docs/ENGINEERING_CASE_STUDY.md)). The research methods now run inside
+  multimodal-biometric-system (Stage B).
 
 ## Explore the work
 
-| Repository | Focus |
-|---|---|
-| [fingerprint-level3-recognition-research](../README.md) | **Current research:** SD302, learned pore descriptors and score fusion |
-| [multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system) | **Stage B, in progress:** a desktop system for enrollment, 1:1 verification and 1:N identification by fingerprint, face and voice |
-| [fingerprint-research](https://github.com/Mish2000/fingerprint-research) | **Application:** verification, gallery search, UI, storage and scanner integration |
-| [fingerprint-benchmark](https://github.com/Mish2000/fingerprint-benchmark) | **Completed benchmark:** six verification routes on SD300 at a shared 500 ppi processing resolution |
-| [fingerprint-new-method](https://github.com/Mish2000/fingerprint-new-method) | **ML/CV case study:** U-Net pore localization on synthetic labels; real-data transfer remained inconclusive |
-| [fingerprint-l3-benchmark](https://github.com/Mish2000/fingerprint-l3-benchmark) | **Historical Level-3 study:** SD300B, SIFT/Direct Pore compositions and execution provenance |
+| Period | Repository | Status | Focus |
+|---|---|---|---|
+| Oct 2026 to now | [multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system) | **In progress** (Stage B, increment 1 of 6) | A desktop system for enrollment, 1:1 verification and 1:N identification by fingerprint, face and voice |
+| Oct 2026 to now | [fingerprint-level3-recognition-research](../README.md) | **Current** (Stage A) | SD302, learned pore descriptors and score fusion |
+| Sep 2026 | [fingerprint-l3-benchmark](https://github.com/Mish2000/fingerprint-l3-benchmark) | Archived | Historical Level-3 study: SD300B, SIFT/Direct Pore compositions and execution provenance |
+| Aug 2026 | [fingerprint-new-method](https://github.com/Mish2000/fingerprint-new-method) | Archived | ML/CV case study: U-Net pore localization on synthetic labels; real-data transfer remained inconclusive |
+| Jul to Sep 2026 | [fingerprint-benchmark](https://github.com/Mish2000/fingerprint-benchmark) | Completed, archived | Six verification routes on SD300 at a shared 500 ppi processing resolution |
+| Feb to Sep 2026 | [fingerprint-research](https://github.com/Mish2000/fingerprint-research) | Archived | Application workbench: verification, gallery search, UI, storage and scanner integration |
 
 The SD302 results measure **1:1 verification under the stated protocol**. The
-workbench is a separate research prototype; integrating the learned method and
-evaluating 1:N search are next steps. Earlier studies retain their own datasets,
-metrics and upstream attribution.
+workbench is an earlier prototype, now archived; Stage B, multimodal-biometric-system,
+is integrating the research methods into a full system with 1:N identification.
+Earlier studies retain their own datasets, metrics and upstream attribution.

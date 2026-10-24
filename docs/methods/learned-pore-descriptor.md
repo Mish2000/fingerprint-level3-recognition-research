@@ -56,6 +56,20 @@ FRR is 0.8% (8/1,000) and 6.1% (28/460). False accepts remain 99/99,000 and
 45/45,540 at the reported operating points. This is a repeat on the same split,
 not a new evaluation population.
 
+### Plain vs plain across devices (2026-10-19)
+
+Probes R (slaps) and Q (fingers segmented from upper palms) on the Crossmatch
+L SCAN 1000PX against references J on the Morpho TouchPrint 5300, at native
+1000 ppi, with the second training (runs/plain/eval/report.json). Fusion
+weights come from the validation subjects' pairs.
+
+| TAR at FAR 0.1 % | RxJ (226 / 29,628) | QxJ (423 / 34,623) |
+|---|---|---|
+| OpenCV SIFT | 70.8 % | 68.1 % |
+| Pore SIFT | 77.9 % | 78.5 % |
+| **Learned pore descriptor** | **95.1 %** | **93.4 %** |
+| Learned + both existing | 95.1 % | 93.1 % |
+
 ## Goal and yardstick
 
 - F4 primary: fusing the Level-3 channel with the best existing algorithm lowers
@@ -78,8 +92,8 @@ not a new evaluation population.
 - Training that descriptor on SD302 development subjects at native 1000 ppi
   gives a learned Level-3 channel sharing Pore SIFT's detector and matching rule.
   Its 32 × 32 patches must fit inside the image, so border detections can be
-  omitted. It is the learning model the researcher approved (D2 entry,
-  2026-10-08) and the Level-3 channel F4 asks for.
+  omitted. It is the learning model approved on 2026-10-08 (D2) and the
+  Level-3 channel F4 asks for.
 
 ## Implemented method
 
@@ -118,7 +132,8 @@ to Horn alignment, fine-tuning and weight decay. This documentation correction
 
 - Part 2 as proposed (a fine-tuned general vision model on the whole print at
   500 ppi) was withdrawn on 2026-10-10: our methods take native ≥1000 ppi input
-  (D1). The next methods follow the Stage B work order in AGENTS.md.
+  (D1). On 2026-10-18 Stage B replaced further method work with the system
+  build in multimodal-biometric-system (H1).
 
 ## Execution and approval
 
