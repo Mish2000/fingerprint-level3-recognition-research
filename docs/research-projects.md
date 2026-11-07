@@ -48,7 +48,7 @@ rejects are 14/1,000 and 39/460; false accepts are 99/99,000 and 45/45,540.
 
 | Period | Repository | Status | Focus |
 |---|---|---|---|
-| Oct 2026 to now | [multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system) | **In progress** (Stage B, increment 1 of 6) | A desktop system for enrollment, 1:1 verification and 1:N identification by fingerprint, face and voice |
+| Oct 2026 to now | [multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system) | **In progress** (Stage B, increment 2 of 6, fingerprint 1:1 verified on the scanner) | A desktop system for enrollment, 1:1 verification and 1:N identification by fingerprint, face and voice |
 | Oct 2026 to now | [fingerprint-level3-recognition-research](../README.md) | **Current** (Stage A) | SD302, learned pore descriptors and score fusion |
 | Sep 2026 | [fingerprint-l3-benchmark](https://github.com/Mish2000/fingerprint-l3-benchmark) | Archived | Historical Level-3 study: SD300B, SIFT/Direct Pore compositions and execution provenance |
 | Aug 2026 | [fingerprint-new-method](https://github.com/Mish2000/fingerprint-new-method) | Archived | ML/CV case study: U-Net pore localization on synthetic labels; real-data transfer remained inconclusive |
