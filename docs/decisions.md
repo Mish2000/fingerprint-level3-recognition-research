@@ -386,3 +386,14 @@ features and the label audit run now; the comparisons follow a report.
 - Earlier records keep their wording. The code, the labels its results pages
   generate, file names such as `docs/methods/learned-pore-descriptor.md`, the
   method, its data and every result are unchanged.
+
+## 2026-11-09: copyright notice
+
+- The README states that the research's code and documentation are under
+  copyright, all rights reserved: public to be read, evaluated and cited, and
+  used, copied, modified or distributed only with prior written permission
+  (system decision H47). Upstream components and the SD302 data keep their
+  own terms.
+- The notice is in the README only. A license file in the repository's root
+  would be a change outside README.md and docs/, that is, a new research
+  version; the code, the method, its data and every result are unchanged.

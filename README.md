@@ -87,3 +87,12 @@ benchmark, the synthetic localization study and the historical SD300B Level-3
 study, all now archived. The present results concern 1:1 verification; Stage B,
 [multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system),
 is building them into a system with 1:N identification.
+
+## License
+
+© 2026 Michael Sirkovich. All rights reserved. The code and documentation are
+public so that the research can be read, evaluated and cited; using, copying,
+modifying or distributing any part of them needs prior written permission. To
+ask for it, open an issue in this repository. The upstream components pinned
+in the [algorithm configuration](configs/algorithms.toml) and the SD302 data
+keep their own licenses and terms.
