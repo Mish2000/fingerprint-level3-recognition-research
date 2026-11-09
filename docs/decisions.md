@@ -376,3 +376,13 @@ features and the label audit run now; the comparisons follow a report.
 
 - Wording of process notes edited for publication; no decision, protocol or
   result changed.
+
+## 2026-11-09: the name Pore CNN
+
+- The learned pore descriptor of this research is called Pore CNN in its
+  README and documentation, and in the system's interface (system decision
+  H46). The name says how it differs from Pore SIFT: the same detected pores,
+  described by a small convolutional neural network instead of SIFT.
+- Earlier records keep their wording. The code, the labels its results pages
+  generate, file names such as `docs/methods/learned-pore-descriptor.md`, the
+  method, its data and every result are unchanged.

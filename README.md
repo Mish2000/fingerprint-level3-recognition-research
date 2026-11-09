@@ -1,7 +1,7 @@
 # Learning from Fingerprint Pores
 
 Fingerprint verification on **native 1000 ppi NIST SD302 live-scan images**,
-combining a learned pore descriptor with OpenCV SIFT and Pore SIFT.
+combining Pore CNN, a learned pore descriptor, with OpenCV SIFT and Pore SIFT.
 Research by **Michael Sirkovich**, under academic supervision.
 
 **[Research overview](docs/research-projects.md)** ·
@@ -16,8 +16,8 @@ from training, early stopping and fusion fitting:
 | Method | Rolled vs rolled | Plain vs rolled |
 |---|---:|---:|
 | OpenCV SIFT + Pore SIFT | 87.4% | 76.5% |
-| Learned pore descriptor alone | 96.9% | 85.0% |
-| Learned pore descriptor + OpenCV SIFT + Pore SIFT | **98.6%** | **91.5%** |
+| Pore CNN alone | 96.9% | 85.0% |
+| Pore CNN + OpenCV SIFT + Pore SIFT | **98.6%** | **91.5%** |
 
 Test pairs: **1,000 genuine / 99,000 impostor** rolled comparisons and
 **460 / 45,540** plain comparisons. The first three-method fusion rejects
@@ -25,8 +25,8 @@ Test pairs: **1,000 genuine / 99,000 impostor** rolled comparisons and
 45/45,540 false accepts. A second training seed reaches **99.2% / 93.9% TAR**
 with the same fusion. [All methods, counts and intervals](docs/methods/learned-pore-descriptor.md).
 
-Plain vs plain across two scanners (2026-10-19), TAR at FAR ≤ 0.1%: the learned
-descriptor (second training) reaches **95.1% / 93.4%** (RxJ / QxJ), against
+Plain vs plain across two scanners (2026-10-19), TAR at FAR ≤ 0.1%: Pore CNN
+(second training) reaches **95.1% / 93.4%** (RxJ / QxJ), against
 70.8% / 68.1% for OpenCV SIFT and 77.9% / 78.5% for Pore SIFT, on 226 / 423
 genuine and 29,628 / 34,623 impostor test pairs.
 
@@ -36,9 +36,9 @@ genuine and 29,628 / 34,623 impostor test pairs.
   pair lists, subject separation, resumable runs and paired evaluation.
 - **Learning:** automatic correspondence generation, **1,064,023 patches** from
   80 training subjects, a PyTorch pore-description network trained from scratch,
-  and 20 validation subjects for early stopping and learned-channel fusion.
+  and 20 validation subjects for early stopping and fusion with Pore CNN.
 - **Execution:** one extraction per image, cached descriptors and GPU batch
-  matching. OpenCV SIFT, Pore SIFT and the learned descriptor were each scored
+  matching. OpenCV SIFT, Pore SIFT and Pore CNN were each scored
   on **582,724 pairs**; the reported test evaluation uses 100 held-out subjects.
 
 The descriptor follows Dahia & Pamplona Segundo's published architecture.
@@ -51,7 +51,7 @@ implementation details.
 |---|---|
 | [data](src/fpl3/data) | SD302 readers, manifests, pairs and subject split |
 | [algorithms](src/fpl3/algorithms) | OpenCV SIFT and Pore SIFT integrations |
-| [method](src/fpl3/method) | Alignment, learned pore descriptor and score fusion |
+| [method](src/fpl3/method) | Alignment, Pore CNN (the learned pore descriptor) and score fusion |
 | [experiments](src/fpl3/experiments) / [eval](src/fpl3/eval) | Runs, timing, evaluation and result pages |
 
 ## Software checks
@@ -69,7 +69,7 @@ pytest -m "not dataset"
 ```
 
 Optional-runtime tests skip when their dependencies are absent. Pore SIFT uses
-its [separate environment](environments/pore-sift-requirements.txt); learned-model
+its [separate environment](environments/pore-sift-requirements.txt); Pore CNN
 tests and execution require the PyTorch GPU environment described in the
 [method note](docs/methods/learned-pore-descriptor.md).
 

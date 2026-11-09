@@ -14,10 +14,10 @@ True-accept rate (TAR) at a false-accept rate (FAR) **at or below 0.1%**:
 | Method | Rolled vs rolled | Plain vs rolled |
 |---|---:|---:|
 | OpenCV SIFT + Pore SIFT | 87.4% | 76.5% |
-| Learned pore descriptor alone | 96.9% | 85.0% |
-| Learned pore descriptor + OpenCV SIFT + Pore SIFT | **98.6%** | **91.5%** |
+| Pore CNN alone | 96.9% | 85.0% |
+| Pore CNN + OpenCV SIFT + Pore SIFT | **98.6%** | **91.5%** |
 
-Adding the learned channel to the existing fusion improves TAR by **11.2 and
+Adding Pore CNN to the existing fusion improves TAR by **11.2 and
 15.0 percentage points**, respectively. These are the first training's results;
 a second training seed reached **99.2% / 93.9%** with the same three-method fusion.
 
@@ -35,7 +35,7 @@ rejects are 14/1,000 and 39/460; false accepts are 99/99,000 and 45/45,540.
   [Alignment code](../src/fpl3/method/annotate.py)
 - **Controlled evaluation:** 80 training / 20 validation / 100 test subjects;
   deterministic manifests, cached extraction and identical comparison pairs.
-  OpenCV SIFT, Pore SIFT and the learned descriptor were each scored on
+  OpenCV SIFT, Pore SIFT and Pore CNN were each scored on
   **582,724 pairs** across the full cohort; the result above uses its test subset.
   [Evaluation code](../src/fpl3/experiments/evaluate.py)
 - **Software integration:** an earlier React/TypeScript and FastAPI workbench,
@@ -49,7 +49,7 @@ rejects are 14/1,000 and 39/460; false accepts are 99/99,000 and 45/45,540.
 | Period | Repository | Status | Focus |
 |---|---|---|---|
 | Oct 2026 to now | [multimodal-biometric-system](https://github.com/Mish2000/multimodal-biometric-system) | **In progress** (Stage B, increment 3 of 6 complete: all three fingerprint methods in 1:1 and 1:N, with their match drawings, checked on HiScan PRO.) | A desktop system for enrollment, 1:1 verification and 1:N identification by fingerprint, face and voice |
-| Oct 2026 to now | [fingerprint-level3-recognition-research](../README.md) | **Current** (Stage A) | SD302, learned pore descriptors and score fusion |
+| Oct 2026 to now | [fingerprint-level3-recognition-research](../README.md) | **Current** (Stage A) | SD302, Pore CNN (a learned pore descriptor) and score fusion |
 | Sep 2026 | [fingerprint-l3-benchmark](https://github.com/Mish2000/fingerprint-l3-benchmark) | Archived | Historical Level-3 study: SD300B, SIFT/Direct Pore compositions and execution provenance |
 | Aug 2026 | [fingerprint-new-method](https://github.com/Mish2000/fingerprint-new-method) | Archived | ML/CV case study: U-Net pore localization on synthetic labels; real-data transfer remained inconclusive |
 | Jul to Sep 2026 | [fingerprint-benchmark](https://github.com/Mish2000/fingerprint-benchmark) | Completed, archived | Six verification routes on SD300 at a shared 500 ppi processing resolution |
